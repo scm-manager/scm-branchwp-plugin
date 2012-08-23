@@ -31,8 +31,16 @@
 
 package sonia.scm.branchwp;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import com.google.common.base.Splitter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -43,6 +51,14 @@ public class BranchWPPermissionParser
 {
 
   /**
+   * the logger for BranchWPPermissionParser
+   */
+  private static final Logger logger =
+    LoggerFactory.getLogger(BranchWPPermissionParser.class);
+
+  //~--- methods --------------------------------------------------------------
+
+  /**
    * Method description
    *
    *
@@ -51,7 +67,72 @@ public class BranchWPPermissionParser
    */
   public static void parse(Set<BranchWPPermission> permissions, String property)
   {
+    if (logger.isTraceEnabled())
+    {
+      logger.trace("try to parse permissions string {}", property);
+    }
 
-    // TODO parse branchwp
+    Iterable<String> permissionStrings =
+      Splitter.on(";").omitEmptyStrings().trimResults().split(property);
+
+    for (String permissionString : permissionStrings)
+    {
+      if (logger.isTraceEnabled())
+      {
+        logger.trace("try to parse permission string {}", permissionString);
+      }
+
+      BranchWPPermission permission = parsePermission(permissionString);
+
+      if (permission != null)
+      {
+        if (logger.isDebugEnabled())
+        {
+          logger.debug("append branchwp permission {}", permission);
+        }
+      }
+      else if (logger.isWarnEnabled())
+      {
+        logger.warn("failed to parse permission string {}", permissionString);
+      }
+    }
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @param permissionString
+   *
+   * @return
+   */
+  private static BranchWPPermission parsePermission(String permissionString)
+  {
+    BranchWPPermission permission = null;
+    Iterator<String> parts = Splitter.on(
+                               ",").omitEmptyStrings().trimResults().split(
+                               permissionString).iterator();
+
+    if (parts.hasNext())
+    {
+      String branch = parts.next();
+
+      if (parts.hasNext())
+      {
+
+        String name = parts.next();
+        boolean group = false;
+
+        if (name.startsWith("@"))
+        {
+          group = true;
+          name = name.substring(1);
+        }
+
+        permission = new BranchWPPermission(branch, name, group);
+      }
+    }
+
+    return permission;
   }
 }
