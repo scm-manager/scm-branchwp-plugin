@@ -55,10 +55,10 @@ public class BranchWPConfiguration implements Serializable
 {
 
   /** Field description */
-  private static final String PROPERTY_ENABLED = "branchwp.enabled";
+  static final String PROPERTY_ENABLED = "branchwp.enabled";
 
   /** Field description */
-  private static final String PROPERTY_PERMISSIONS = "branchwp.permissions";
+  static final String PROPERTY_PERMISSIONS = "branchwp.permissions";
 
   /** Field description */
   private static final long serialVersionUID = 1089077731493333795L;
@@ -79,6 +79,7 @@ public class BranchWPConfiguration implements Serializable
    */
   public BranchWPConfiguration(PropertiesAware properties)
   {
+    this.properties = properties;
     enabled = Boolean.valueOf(properties.getProperty(PROPERTY_ENABLED));
   }
 
