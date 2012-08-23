@@ -191,20 +191,18 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
             logger.warn("access denied for branch {}", changeset.getBranches());
           }
 
-          privileged = false;
-
-          break;
+          throw new IllegalStateException("no permissions to write to branch");
         }
       }
     }
-    else if (logger.isWarnEnabled())
+    else
     {
-      logger.warn("branchwp permissions are empty, access denied");
-    }
+      if (logger.isWarnEnabled())
+      {
+        logger.warn("branchwp permissions are empty, access denied");
+      }
 
-    if (!privileged)
-    {
-      throw new IllegalStateException("not permission to write this branch");
+      throw new IllegalStateException("no branchwp permissions defined");
     }
   }
 
