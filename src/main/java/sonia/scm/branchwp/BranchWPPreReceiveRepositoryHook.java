@@ -39,6 +39,7 @@ import com.google.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import sonia.scm.plugin.ext.Extension;
 import sonia.scm.repository.PermissionType;
 import sonia.scm.repository.PermissionUtil;
 import sonia.scm.repository.PreReceiveRepositoryHook;
@@ -52,6 +53,7 @@ import sonia.scm.web.security.WebSecurityContext;
  *
  * @author Sebastian Sdorra
  */
+@Extension
 public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
 {
 
@@ -145,10 +147,14 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
    * Method description
    *
    *
+   *
+   * @param config
    * @param event
    */
-  private void handleBranchWP(BranchWPConfiguration config, RepositoryHookEvent event)
+  private void handleBranchWP(BranchWPConfiguration config,
+    RepositoryHookEvent event)
   {
+
     // TODO handle branchwp
   }
 
