@@ -30,6 +30,7 @@
  */
 
 
+
 package sonia.scm.branchwp;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -53,6 +54,7 @@ import sonia.scm.web.security.WebSecurityContext;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -62,6 +64,15 @@ import java.util.Set;
 @Extension
 public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
 {
+
+  /** Field description */
+  private static final String BRANCH_HG_DEFAULT = "default";
+
+  /** Field description */
+  private static final String TYPE_GIT = "git";
+
+  /** Field description */
+  private static final String TYPE_HG = "hg";
 
   /**
    * the logger for BranchwpPreReceiveRepositoryHook
@@ -203,6 +214,31 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
    * Method description
    *
    *
+   * @param type
+   * @param branches
+   *
+   * @return
+   */
+  private String getBranchName(String type, List<String> branches)
+  {
+    String branch = null;
+
+    if (branches.isEmpty() && TYPE_HG.equals(type))
+    {
+      branch = BRANCH_HG_DEFAULT;
+    }
+    else
+    {
+      branch = branches.get(0);
+    }
+
+    return branch;
+  }
+
+  /**
+   * Method description
+   *
+   *
    * @param context
    * @param user
    * @param repository
@@ -259,7 +295,46 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
   {
     boolean privileged = false;
 
-    // TODO implement
+    String type = repository.getType();
+
+    List<String> braches = changeset.getBranches();
+
+    if (braches.isEmpty() && TYPE_GIT.equals(type))
+    {
+      if (logger.isTraceEnabled())
+      {
+        logger.trace(
+          "git changeset {} is no repository head and has no branch informations",
+          changeset.getId());
+      }
+
+      privileged = true;
+    }
+    else
+    {
+      String username = context.getUser().getName();
+
+      String branch = getBranchName(type, braches);
+
+      for (BranchWPPermission bwp : permissions)
+      {
+        //J-
+        if ((branch.equals(bwp.getBranch())
+           && (bwp.isGroup() && context.getGroups().contains(bwp.getName()))) 
+           || (!bwp.isGroup() && username.equals(bwp.getName())))
+        {
+          if ( logger.isTraceEnabled() )
+          {
+            logger.trace("changeset {} granted by {}", changeset.getId(), bwp);
+          }
+          
+          privileged = true;
+          break;
+        }
+        //J+
+      }
+
+    }
 
     return privileged;
   }
