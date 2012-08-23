@@ -34,15 +34,8 @@
 <plugin>
 
   <information>
-    <groupId>${project.groupId}</groupId>
-    <artifactId>${project.artifactId}</artifactId>
-    <version>${project.version}</version>
-    <name>${project.name}</name>
-    <description>${project.description}</description>
-    <!--
-    <author></author>
-    <url>${project.url}</url>
-    -->
+    <author>Sebastian Sdorra</author>
+    <url>https://bitbucket.org/sdorra/scm-branchwp-plugin</url>
   </information>
 
   <packages>
@@ -50,7 +43,7 @@
   </packages>
 
   <resources>
-    <script>/scm/sample.hello.js</script>
+    <script>/scm/sonia.branchwp.js</script>
   </resources>
 
 </plugin>
