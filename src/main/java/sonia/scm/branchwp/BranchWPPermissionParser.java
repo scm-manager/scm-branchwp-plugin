@@ -90,6 +90,8 @@ public class BranchWPPermissionParser
         {
           logger.debug("append branchwp permission {}", permission);
         }
+
+        permissions.add(permission);
       }
       else if (logger.isWarnEnabled())
       {
