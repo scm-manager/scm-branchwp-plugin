@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import sonia.scm.plugin.ext.Extension;
+import sonia.scm.repository.Changeset;
 import sonia.scm.repository.PermissionType;
 import sonia.scm.repository.PermissionUtil;
 import sonia.scm.repository.PreReceiveRepositoryHook;
@@ -48,6 +49,10 @@ import sonia.scm.repository.RepositoryHookEvent;
 import sonia.scm.user.User;
 import sonia.scm.util.SecurityUtil;
 import sonia.scm.web.security.WebSecurityContext;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.Set;
 
 /**
  *
@@ -125,7 +130,7 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
               repository.getName());
           }
 
-          handleBranchWP(config, event);
+          handleBranchWP(context, config, event);
 
         }
         else if (logger.isDebugEnabled())
@@ -148,14 +153,47 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
    *
    *
    *
+   *
+   * @param context
    * @param config
    * @param event
    */
-  private void handleBranchWP(BranchWPConfiguration config,
-    RepositoryHookEvent event)
+  private void handleBranchWP(WebSecurityContext context,
+    BranchWPConfiguration config, RepositoryHookEvent event)
   {
+    boolean privileged = false;
+    Set<BranchWPPermission> permissions = config.getPermissions();
 
-    // TODO handle branchwp
+    if (!permissions.isEmpty())
+    {
+      Repository repository = event.getRepository();
+
+      privileged = true;
+
+      for (Changeset changeset : event.getChangesets())
+      {
+        if (!isPrivileged(context, repository, permissions, changeset))
+        {
+          if (logger.isWarnEnabled())
+          {
+            logger.warn("access denied for branch {}", changeset.getBranches());
+          }
+
+          privileged = false;
+
+          break;
+        }
+      }
+    }
+    else if (logger.isWarnEnabled())
+    {
+      logger.warn("branchwp permissions are empty, access denied");
+    }
+
+    if (!privileged)
+    {
+      throw new IllegalStateException("not permission to write this branch");
+    }
   }
 
   //~--- get methods ----------------------------------------------------------
@@ -199,6 +237,30 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
     }
 
     return adminOrOwner;
+  }
+
+  /**
+   * Method description
+   *
+   *
+   *
+   * @param context
+   * @param repository
+   * @param permissions
+   * @param c
+   * @param changeset
+   *
+   * @return
+   */
+  private boolean isPrivileged(WebSecurityContext context,
+    Repository repository, Set<BranchWPPermission> permissions,
+    Changeset changeset)
+  {
+    boolean privileged = false;
+
+    // TODO implement
+
+    return privileged;
   }
 
   //~--- fields ---------------------------------------------------------------
