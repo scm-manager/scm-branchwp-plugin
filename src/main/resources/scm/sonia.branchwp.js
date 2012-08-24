@@ -29,4 +29,214 @@
  *
  */
 
-// TODO create form for branchwp permissions
+Ext.ns('Sonia.branchwp');
+
+Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
+  
+  formTitleText: 'Branch Write Protection',
+  enabledText: 'Enable',
+  colBranchText: 'Branch',
+  colNameText: 'Name',
+  colGroupText: 'Is Group',
+  addText: 'Add',
+  removeTest: 'Remove',
+  
+  addIcon: 'resources/images/add.gif',
+  removeIcon: 'resources/images/delete.gif',
+  
+  enableHelpText: 'Enable Path write protection. \n\
+    Only admins, owners and users defined in the whitelist below are able to write.',
+  branchwpGridHelpText: 'Path write protection whitelist.',
+  
+  branchwpStore: null,
+  
+  initComponent: function(){
+    this.branchwpStore = new Ext.data.ArrayStore({
+      root: 'permissions',
+      fields: [
+        {name: 'branch'},
+        {name: 'name'},
+        {name: 'group', type: 'boolean'}
+      ],
+      sortInfo: {
+        field: 'branch'
+      }
+    });
+    
+    this.loadBranchwpPermissions(this.branchwpStore, this.item);
+  
+    var selectionModel = new Ext.grid.RowSelectionModel({
+      singleSelect: true
+    });
+  
+    var branchwpColModel = new Ext.grid.ColumnModel({
+      defaults: {
+        sortable: true,
+        editable: true
+      },
+      columns: [{
+        id: 'branch',
+        dataIndex: 'branch',
+        header: this.colBranchText,
+        editor: Ext.form.TextField
+      },{
+        id: 'name',
+        dataIndex: 'name',
+        header: this.colNameText,
+        editor: Ext.form.TextField
+      },{
+        id: 'group',
+        dataIndex: 'group',
+        xtype: 'checkcolumn',
+        header: this.colGroupText,
+        width: 40,
+        editable: true
+      }]
+    });
+
+    var config = {
+      title: this.formTitleText,
+      items: [{
+        xtype: 'checkbox',
+        fieldLabel: this.enabledText,
+        name: 'branchwpEnabled',
+        inputValue: 'true',
+        property: 'branchwp.enabled',
+        helpText: this.enableHelpText
+      },{
+        id: 'branchwpGrid',
+        xtype: 'editorgrid',
+        clicksToEdit: 1,
+        autoExpandColumn: 'branch',
+        frame: true,
+        width: '100%',
+        autoHeight: true,
+        autoScroll: false,
+        colModel: branchwpColModel,
+        sm: selectionModel,
+        store: this.branchwpStore,
+        viewConfig: {
+          forceFit:true
+        },
+        tbar: [{
+          text: this.addText,
+          scope: this,
+          icon: this.addIcon,
+          handler : function(){
+            var Permission = this.branchwpStore.recordType;
+            var p = new Permission();
+            var grid = Ext.getCmp('branchwpGrid');
+            grid.stopEditing();
+            this.branchwpStore.insert(0, p);
+            grid.startEditing(0, 0);
+          }
+        },{
+          text: this.removeText,
+          scope: this,
+          icon: this.removeIcon,
+          handler: function(){
+            var grid = Ext.getCmp('branchwpGrid');
+            var selected = grid.getSelectionModel().getSelected();
+            if ( selected ){
+              this.branchwpStore.remove(selected);
+            }
+          }
+        }]
+      }]
+    };
+    
+    Ext.apply(this, Ext.apply(this.initialConfig, config));
+    Sonia.branchwp.ConfigPanel.superclass.initComponent.apply(this, arguments);
+  }, 
+  
+  loadBranchwpPermissions: function(store, repository){
+    if (debug){
+      console.debug('load branchwp properties');
+    }
+    if (!repository.properties){
+      repository.properties = [];
+    }
+    Ext.each(repository.properties, function(prop){
+      if ( prop.key == 'branchwp.permissions' ){
+        var value = prop.value;
+        this.parsePermissions(store, value);
+      }
+    }, this);
+  },
+  
+  parsePermissions: function(store, permString){
+    var parts = permString.match(/[^,]+,[^,]+;/g);
+    if (debug){
+      console.debug('branch permissions:');
+      console.debug( parts );
+    }
+    Ext.each(parts, function(part){
+      if ( part.endsWith(';') ){
+        part = part.substring(0, part.length -1);
+      }
+      var pa = part.split(',');
+      var group = false;
+      if ( pa[1].indexOf('@') == 0 ){
+        group = true;
+        pa[1] = pa[1].substring(1);
+      }
+      var Permission = store.recordType;
+      var p = new Permission({
+        branch: pa[0],
+        group: group,
+        name: pa[1]
+      });
+      if (debug){
+        console.debug( 'add permission: ' );
+        console.debug( p );
+      }
+      store.add(p);
+    });
+  },
+  
+  storeExtraProperties: function(repository){
+    if (debug){
+      console.debug('store branchpw properties');
+    }
+    
+    // delete old permissions
+    Ext.each(repository.properties, function(prop, index){
+      if ( prop.key == 'branchwp.permissions' ){
+        delete repository.properties[index];
+      }
+    });
+    
+    var permissionString = '';
+    this.branchwpStore.data.each(function(r){
+      var p = r.data;
+      permissionString += p.branch + ',';
+      if (p.group){
+        permissionString += '@';
+      }
+      permissionString += p.name + ';';
+    });
+    
+    if (debug){
+      console.debug('add branchwp permission string: ' + permissionString);
+    }
+    
+    repository.properties.push({
+      key: 'branchwp.permissions',
+      value: permissionString
+    });
+  }
+  
+});
+
+// register xtype
+Ext.reg("branchwpConfigPanel", Sonia.branchwp.ConfigPanel);
+
+// register panel
+Sonia.repository.openListeners.push(function(repository, panels){
+  if (Sonia.repository.isOwner(repository)){
+    panels.push({
+      xtype: 'branchwpConfigPanel',
+      item: repository
+    });
+  }
+});
