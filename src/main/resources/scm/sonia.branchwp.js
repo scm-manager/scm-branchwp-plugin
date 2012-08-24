@@ -44,9 +44,9 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
   addIcon: 'resources/images/add.gif',
   removeIcon: 'resources/images/delete.gif',
   
-  enableHelpText: 'Enable Path write protection. \n\
+  enableHelpText: 'Enable Branch write protection. \n\
     Only admins, owners and users defined in the whitelist below are able to write.',
-  branchwpGridHelpText: 'Path write protection whitelist.',
+  branchwpGridHelpText: 'Branch write protection whitelist.',
   
   branchwpStore: null,
   
