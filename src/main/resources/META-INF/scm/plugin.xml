@@ -36,7 +36,12 @@
   <information>
     <author>Sebastian Sdorra</author>
     <url>https://bitbucket.org/sdorra/scm-branchwp-plugin</url>
+    <wiki>https://bitbucket.org/sdorra/scm-manager/wiki/branchwp-plugin</wiki>
   </information>
+
+  <conditions>
+    <min-version>${project.parent.version}</min-version>
+  </conditions>
 
   <packages>
     <package>sonia.scm.branchwp</package>
