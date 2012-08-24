@@ -234,9 +234,12 @@ Ext.reg("branchwpConfigPanel", Sonia.branchwp.ConfigPanel);
 // register panel
 Sonia.repository.openListeners.push(function(repository, panels){
   if (Sonia.repository.isOwner(repository)){
-    panels.push({
-      xtype: 'branchwpConfigPanel',
-      item: repository
-    });
+    var type = Sonia.repository.getTypeByName( repository.type );
+    if ( type && type.supportedCommands && type.supportedCommands.indexOf('BRANCHES') >= 0){
+      panels.push({
+        xtype: 'branchwpConfigPanel',
+        item: repository
+      });
+    }
   }
 });
