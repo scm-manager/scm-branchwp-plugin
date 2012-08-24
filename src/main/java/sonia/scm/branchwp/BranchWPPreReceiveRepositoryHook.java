@@ -292,9 +292,9 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
 
     String type = repository.getType();
 
-    List<String> braches = changeset.getBranches();
+    List<String> branches = changeset.getBranches();
 
-    if (braches.isEmpty() && TYPE_GIT.equals(type))
+    if (branches.isEmpty() && TYPE_GIT.equals(type))
     {
       if (logger.isTraceEnabled())
       {
@@ -309,14 +309,20 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
     {
       String username = context.getUser().getName();
 
-      String branch = getBranchName(type, braches);
+      String branch = getBranchName(type, branches);
+
+      if (logger.isTraceEnabled())
+      {
+        logger.trace("check write permission of user {} for branch {}",
+          username, branch);
+      }
 
       for (BranchWPPermission bwp : permissions)
       {
         //J-
-        if ((branch.equals(bwp.getBranch())
-           && (bwp.isGroup() && context.getGroups().contains(bwp.getName()))) 
-           || (!bwp.isGroup() && username.equals(bwp.getName())))
+        if (branch.equals(bwp.getBranch())
+           && ((bwp.isGroup() && context.getGroups().contains(bwp.getName()))
+           || (!bwp.isGroup() && username.equals(bwp.getName()))))
         {
           if ( logger.isTraceEnabled() )
           {
@@ -327,6 +333,11 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
           break;
         }
         //J+
+      }
+
+      if (!privileged && logger.isWarnEnabled())
+      {
+        logger.warn("access denied for user {} at branch {}", username, branch);
       }
 
     }
