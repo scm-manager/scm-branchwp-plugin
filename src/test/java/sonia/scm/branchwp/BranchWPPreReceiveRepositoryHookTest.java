@@ -59,7 +59,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Set;
-import org.junit.Ignore;
 
 /**
  *
@@ -150,7 +149,6 @@ public class BranchWPPreReceiveRepositoryHookTest
    * TODO fix test
    *
    */
-  @Ignore
   @Test(expected = BranchWPException.class)
   public void testMultipleConfigAccessDenied()
   {
@@ -173,7 +171,7 @@ public class BranchWPPreReceiveRepositoryHookTest
     Changeset c1 = createChangeset("0", "master");
     Changeset c2 = createChangeset("1", "default");
 
-    hook.onEvent(createHookEvent("master,dent;master,marvin;default,other",
+    hook.onEvent(createHookEvent("master,dent;master,marvin;default,@other",
       true, false, c1, c2));
   }
 
