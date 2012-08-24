@@ -111,7 +111,7 @@ public class BranchWPPreReceiveRepositoryHookTest
    * Method description
    *
    */
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = BranchWPException.class)
   public void testEmptyAndDenied()
   {
     BranchWPPreReceiveRepositoryHook hook = createHook(false);
@@ -124,7 +124,7 @@ public class BranchWPPreReceiveRepositoryHookTest
    * Method description
    *
    */
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = BranchWPException.class)
   public void testGroupAccessDenied()
   {
     BranchWPPreReceiveRepositoryHook hook = createHook(false, "other");
@@ -151,7 +151,7 @@ public class BranchWPPreReceiveRepositoryHookTest
    *
    */
   @Ignore
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = BranchWPException.class)
   public void testMultipleConfigAccessDenied()
   {
     BranchWPPreReceiveRepositoryHook hook = createHook(false, "ka", "noother");
@@ -181,7 +181,7 @@ public class BranchWPPreReceiveRepositoryHookTest
    * Method description
    *
    */
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = BranchWPException.class)
   public void testUserAccessDenied()
   {
     BranchWPPreReceiveRepositoryHook hook = createHook(false);

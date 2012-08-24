@@ -173,14 +173,11 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
   private void handleBranchWP(WebSecurityContext context,
     BranchWPConfiguration config, RepositoryHookEvent event)
   {
-    boolean privileged = false;
     Set<BranchWPPermission> permissions = config.getPermissions();
 
     if (!permissions.isEmpty())
     {
       Repository repository = event.getRepository();
-
-      privileged = true;
 
       for (Changeset changeset : event.getChangesets())
       {
@@ -191,7 +188,7 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
             logger.warn("access denied for branch {}", changeset.getBranches());
           }
 
-          throw new IllegalStateException("no permissions to write to branch");
+          throw new BranchWPException("no permissions to write to branch");
         }
       }
     }
@@ -202,7 +199,7 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
         logger.warn("branchwp permissions are empty, access denied");
       }
 
-      throw new IllegalStateException("no branchwp permissions defined");
+      throw new BranchWPException("no branchwp permissions defined");
     }
   }
 
