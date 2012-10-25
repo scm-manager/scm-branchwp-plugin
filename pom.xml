@@ -12,7 +12,7 @@
   <groupId>sonia.scm.plugins</groupId>
   <artifactId>scm-branchwp-plugin</artifactId>
   <packaging>jar</packaging>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <name>${project.artifactId}</name>
   <description>This plugin adds branch write protection for repositories.</description>
 
@@ -45,4 +45,8 @@
     </repository>
   
   </repositories>
+
+  <scm>
+    <tag>1.1</tag>
+  </scm>
 </project>
