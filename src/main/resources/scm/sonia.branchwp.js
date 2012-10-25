@@ -43,6 +43,7 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
   
   addIcon: 'resources/images/add.gif',
   removeIcon: 'resources/images/delete.gif',
+  helpIcon: 'resources/images/help.gif',
   
   enableHelpText: 'Enable Branch write protection. \n\
     Only admins, owners and users defined in the whitelist below are able to write.',
@@ -141,13 +142,32 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
               this.branchwpStore.remove(selected);
             }
           }
+        }, '->',{
+          id: 'branchwpGridHelp',
+          xtype: 'box',
+          autoEl: {
+            tag: 'img',
+            src: this.helpIcon
+          }
         }]
       }]
     };
     
     Ext.apply(this, Ext.apply(this.initialConfig, config));
     Sonia.branchwp.ConfigPanel.superclass.initComponent.apply(this, arguments);
-  }, 
+  },
+  
+  afterRender: function(){
+    // call super
+    Sonia.branchwp.ConfigPanel.superclass.afterRender.apply(this, arguments);
+
+    Ext.QuickTips.register({
+      target: Ext.getCmp('branchwpGridHelp'),
+      title: '',
+      text: this.branchwpGridHelpText,
+      enabled: true
+    });
+  },
   
   loadBranchwpPermissions: function(store, repository){
     if (debug){
