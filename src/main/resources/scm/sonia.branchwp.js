@@ -46,7 +46,7 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
   
   enableHelpText: 'Enable Branch write protection. \n\
     Only admins, owners and users defined in the whitelist below are able to write.',
-  branchwpGridHelpText: 'Branch write protection whitelist.',
+  branchwpGridHelpText: 'Branch write protection whitelist. <b>Note:</b> You can use glob syntax for branch names.',
   
   branchwpStore: null,
   

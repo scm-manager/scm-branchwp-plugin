@@ -49,6 +49,7 @@ import sonia.scm.repository.PreReceiveRepositoryHook;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryHookEvent;
 import sonia.scm.user.User;
+import sonia.scm.util.GlobUtil;
 import sonia.scm.util.SecurityUtil;
 import sonia.scm.web.security.WebSecurityContext;
 
@@ -320,7 +321,7 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
       for (BranchWPPermission bwp : permissions)
       {
         //J-
-        if (branch.equals(bwp.getBranch())
+        if (GlobUtil.matches(bwp.getBranch(), branch)
            && ((bwp.isGroup() && context.getGroups().contains(bwp.getName()))
            || (!bwp.isGroup() && username.equals(bwp.getName()))))
         {
