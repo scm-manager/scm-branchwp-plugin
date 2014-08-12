@@ -105,7 +105,7 @@ public class BranchWPPermissionParser
     {
       logger.trace("try to parse permission string {}", permissionString);
 
-      BranchWPPermission permission = parsePermission(permissionString);
+      BranchWPPermission permission = parsePermission(user, permissionString);
 
       if (permission != null)
       {
@@ -126,21 +126,7 @@ public class BranchWPPermissionParser
       }
     }
   }
-
-  /**
-   * Method description
-   *
-   *
-   * @param permissionString
-   *
-   * @return
-   */
-  @VisibleForTesting
-  static BranchWPPermission parsePermission(String permissionString)
-  {
-    return parsePermission(null, permissionString);
-  }
-
+  
   /**
    * Method description
    *

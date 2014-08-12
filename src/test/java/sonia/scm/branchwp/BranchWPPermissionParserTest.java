@@ -143,10 +143,11 @@ public class BranchWPPermissionParserTest
   public void testParsePermissionType()
   {
     BranchWPPermission perm =
-      BranchWPPermissionParser.parsePermission("default,perfect");
+      BranchWPPermissionParser.parsePermission(trillian, "default,perfect");
 
     assertEquals(Type.ALLOW, perm.getType());
-    perm = BranchWPPermissionParser.parsePermission("!default,perfect");
+    perm = BranchWPPermissionParser.parsePermission(trillian,
+      "!default,perfect");
     assertEquals(Type.DENY, perm.getType());
   }
 
