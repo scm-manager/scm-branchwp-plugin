@@ -30,6 +30,7 @@
  */
 
 
+
 package sonia.scm.branchwp;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -92,25 +93,30 @@ public class BranchWPConfiguration implements Serializable
    *
    * @return
    */
-  public Set<BranchWPPermission> getPermissions()
+  public Set<BranchWPPermission> getAllowPermissions()
   {
-    if (permissions == null)
+    if (allowPermissions == null)
     {
-      permissions = Sets.newHashSet();
-
-      String property = properties.getProperty(PROPERTY_PERMISSIONS);
-
-      if (!Strings.isNullOrEmpty(property))
-      {
-        BranchWPPermissionParser.parse(permissions, property);
-      }
-      else if (logger.isDebugEnabled())
-      {
-        logger.debug("no permissions found");
-      }
+      parsePermissions();
     }
 
-    return permissions;
+    return allowPermissions;
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @return
+   */
+  public Set<BranchWPPermission> getDenyPermissions()
+  {
+    if (denyPermissions == null)
+    {
+      parsePermissions();
+    }
+
+    return denyPermissions;
   }
 
   /**
@@ -124,14 +130,57 @@ public class BranchWPConfiguration implements Serializable
     return enabled;
   }
 
+  /**
+   * Method description
+   *
+   *
+   * @return
+   */
+  public boolean isPermissionConfigEmpty()
+  {
+    if ((allowPermissions == null) || (denyPermissions == null))
+    {
+      parsePermissions();
+    }
+
+    return allowPermissions.isEmpty() && denyPermissions.isEmpty();
+  }
+
+  //~--- methods --------------------------------------------------------------
+
+  /**
+   * Method description
+   *
+   */
+  private void parsePermissions()
+  {
+    allowPermissions = Sets.newHashSet();
+    denyPermissions = Sets.newHashSet();
+
+    String property = properties.getProperty(PROPERTY_PERMISSIONS);
+
+    if (!Strings.isNullOrEmpty(property))
+    {
+      BranchWPPermissionParser.parse(allowPermissions, denyPermissions,
+        property);
+    }
+    else if (logger.isDebugEnabled())
+    {
+      logger.debug("no permissions found");
+    }
+  }
+
   //~--- fields ---------------------------------------------------------------
 
   /** Field description */
+  private final PropertiesAware properties;
+
+  /** Field description */
+  private Set<BranchWPPermission> allowPermissions;
+
+  /** Field description */
+  private Set<BranchWPPermission> denyPermissions;
+
+  /** Field description */
   private boolean enabled = false;
-
-  /** Field description */
-  private Set<BranchWPPermission> permissions;
-
-  /** Field description */
-  private PropertiesAware properties;
 }

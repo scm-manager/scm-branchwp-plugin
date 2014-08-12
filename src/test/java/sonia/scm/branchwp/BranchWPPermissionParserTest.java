@@ -30,6 +30,7 @@
  */
 
 
+
 package sonia.scm.branchwp;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -37,6 +38,8 @@ package sonia.scm.branchwp;
 import com.google.common.collect.Sets;
 
 import org.junit.Test;
+
+import sonia.scm.branchwp.BranchWPPermission.Type;
 
 import static org.junit.Assert.*;
 
@@ -128,5 +131,20 @@ public class BranchWPPermissionParserTest
     assertEquals("default", permission.getBranch());
     assertEquals("perfect", permission.getName());
     assertFalse(permission.isGroup());
+  }
+
+  /**
+   * Method description
+   *
+   */
+  @Test
+  public void testParsePermissionType()
+  {
+    BranchWPPermission perm =
+      BranchWPPermissionParser.parsePermission("default,perfect");
+
+    assertEquals(Type.ALLOW, perm.getType());
+    perm = BranchWPPermissionParser.parsePermission("!default,perfect");
+    assertEquals(Type.DENY, perm.getType());
   }
 }

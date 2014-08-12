@@ -89,11 +89,12 @@ public class BranchWPConfigurationTest
 
     properties.setProperty(BranchWPConfiguration.PROPERTY_ENABLED, "true");
     properties.setProperty(BranchWPConfiguration.PROPERTY_PERMISSIONS,
-      "master,dent;default,@heartofgold");
+      "master,dent;default,@heartofgold;!master,perfect");
 
     BranchWPConfiguration cfg = new BranchWPConfiguration(properties);
 
     assertTrue(cfg.isEnabled());
-    assertEquals(2, cfg.getPermissions().size());
+    assertEquals(2, cfg.getAllowPermissions().size());
+    assertEquals(1, cfg.getDenyPermissions().size());
   }
 }

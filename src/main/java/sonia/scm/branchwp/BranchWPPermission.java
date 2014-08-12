@@ -30,6 +30,7 @@
  */
 
 
+
 package sonia.scm.branchwp;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -50,6 +51,14 @@ public class BranchWPPermission implements Serializable
   /** Field description */
   private static final long serialVersionUID = -2725077333533181778L;
 
+  //~--- constant enums -------------------------------------------------------
+
+  /**
+   * Enum description
+   *
+   */
+  public static enum Type { ALLOW, DENY; }
+
   //~--- constructors ---------------------------------------------------------
 
   /**
@@ -62,9 +71,25 @@ public class BranchWPPermission implements Serializable
    */
   public BranchWPPermission(String branch, String name, boolean group)
   {
+    this(branch, name, group, Type.ALLOW);
+  }
+
+  /**
+   * Constructs ...
+   *
+   *
+   * @param branch
+   * @param name
+   * @param group
+   * @param type
+   */
+  public BranchWPPermission(String branch, String name, boolean group,
+    Type type)
+  {
     this.branch = branch;
     this.name = name;
     this.group = group;
+    this.type = type;
   }
 
   //~--- methods --------------------------------------------------------------
@@ -95,7 +120,8 @@ public class BranchWPPermission implements Serializable
     //J-
     return Objects.equal(branch, other.branch)
       && Objects.equal(name, other.name) 
-      && Objects.equal(group, other.group);
+      && Objects.equal(group, other.group)
+      && Objects.equal(type, other.type);
     //J+
   }
 
@@ -108,7 +134,7 @@ public class BranchWPPermission implements Serializable
   @Override
   public int hashCode()
   {
-    return Objects.hashCode(branch, name, group);
+    return Objects.hashCode(branch, name, group, type);
   }
 
   /**
@@ -125,6 +151,7 @@ public class BranchWPPermission implements Serializable
                   .add("branch", branch)
                   .add("name", name)
                   .add("group", group)
+                  .add("type", type)
                   .toString();
     //J+
   }
@@ -159,6 +186,17 @@ public class BranchWPPermission implements Serializable
    *
    * @return
    */
+  public Type getType()
+  {
+    return type;
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @return
+   */
   public boolean isGroup()
   {
     return group;
@@ -167,11 +205,14 @@ public class BranchWPPermission implements Serializable
   //~--- fields ---------------------------------------------------------------
 
   /** Field description */
-  private String branch;
+  private final String branch;
 
   /** Field description */
-  private boolean group;
+  private final boolean group;
 
   /** Field description */
-  private String name;
+  private final String name;
+
+  /** Field description */
+  private final Type type;
 }

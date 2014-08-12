@@ -38,6 +38,7 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
   colBranchText: 'Branch',
   colNameText: 'Name',
   colGroupText: 'Is Group',
+  colDenyText: 'Deny',
   addText: 'Add',
   removeTest: 'Remove',
   
@@ -47,7 +48,8 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
   
   enableHelpText: 'Enable Branch write protection. \n\
     Only admins, owners and users defined in the whitelist below are able to write.',
-  branchwpGridHelpText: 'Branch write protection whitelist. <b>Note:</b> You can use glob syntax for branch names.',
+  branchwpGridHelpText: 'Branch write protection whitelist. Deny comes always for allow permissions. \n\
+                         <b>Note:</b> You can use glob syntax for branch names.',
   
   branchwpStore: null,
   
@@ -57,7 +59,8 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
       fields: [
         {name: 'branch'},
         {name: 'name'},
-        {name: 'group', type: 'boolean'}
+        {name: 'group', type: 'boolean'},
+        {name: 'deny', type: 'boolean'}
       ],
       sortInfo: {
         field: 'branch'
@@ -90,6 +93,13 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
         dataIndex: 'group',
         xtype: 'checkcolumn',
         header: this.colGroupText,
+        width: 40,
+        editable: true
+      },{
+        id: 'deny',
+        dataIndex: 'deny',
+        xtype: 'checkcolumn',
+        header: this.colDisallowText,
         width: 40,
         editable: true
       }]
@@ -177,7 +187,7 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
       repository.properties = [];
     }
     Ext.each(repository.properties, function(prop){
-      if ( prop.key == 'branchwp.permissions' ){
+      if ( prop.key === 'branchwp.permissions' ){
         var value = prop.value;
         this.parsePermissions(store, value);
       }
@@ -195,8 +205,13 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
         part = part.substring(0, part.length -1);
       }
       var pa = part.split(',');
+      var deny = false;
+      if (pa[0].indexOf('!') === 0){
+        deny = true;
+        pa[0] = pa[0].substring(1);
+      }
       var group = false;
-      if ( pa[1].indexOf('@') == 0 ){
+      if ( pa[1].indexOf('@') === 0 ){
         group = true;
         pa[1] = pa[1].substring(1);
       }
@@ -204,7 +219,8 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
       var p = new Permission({
         branch: pa[0],
         group: group,
-        name: pa[1]
+        name: pa[1],
+        deny: deny
       });
       if (debug){
         console.debug( 'add permission: ' );
@@ -221,7 +237,7 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
     
     // delete old permissions
     Ext.each(repository.properties, function(prop, index){
-      if ( prop.key == 'branchwp.permissions' ){
+      if ( prop.key === 'branchwp.permissions' ){
         delete repository.properties[index];
       }
     });
@@ -229,6 +245,9 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
     var permissionString = '';
     this.branchwpStore.data.each(function(r){
       var p = r.data;
+      if (p.deny){
+        permissionString += '!';
+      }
       permissionString += p.branch + ',';
       if (p.group){
         permissionString += '@';

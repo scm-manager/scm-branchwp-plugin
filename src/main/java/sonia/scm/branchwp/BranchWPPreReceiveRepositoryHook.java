@@ -35,6 +35,7 @@ package sonia.scm.branchwp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -56,7 +57,6 @@ import sonia.scm.web.security.WebSecurityContext;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
-import java.util.Set;
 
 /**
  *
@@ -161,6 +161,67 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
 
   }
 
+  //~--- get methods ----------------------------------------------------------
+
+  /**
+   * Method description
+   *
+   *
+   *
+   * @param context
+   * @param repository
+   * @param permissions
+   * @param c
+   * @param config
+   * @param changeset
+   *
+   * @return
+   */
+  @VisibleForTesting
+  boolean isPrivileged(WebSecurityContext context, Repository repository,
+    BranchWPConfiguration config, Changeset changeset)
+  {
+    boolean privileged = false;
+
+    String type = repository.getType();
+
+    List<String> branches = changeset.getBranches();
+
+    if (branches.isEmpty() && TYPE_GIT.equals(type))
+    {
+      if (logger.isTraceEnabled())
+      {
+        logger.trace(
+          "git changeset {} is not the repository head and has no branch informations",
+          changeset.getId());
+      }
+
+      privileged = true;
+    }
+    else
+    {
+      String username = context.getUser().getName();
+
+      String branch = getBranchName(type, branches);
+
+      if (!isChangesetDenied(config, changeset, branch, context, username))
+      {
+        privileged = isChangesetAllowed(config, changeset, branch, context,
+          username);
+      }
+
+      if (!privileged && logger.isWarnEnabled())
+      {
+        logger.warn("access denied for user {} at branch {}", username, branch);
+      }
+
+    }
+
+    return privileged;
+  }
+
+  //~--- methods --------------------------------------------------------------
+
   /**
    * Method description
    *
@@ -174,22 +235,20 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
   private void handleBranchWP(WebSecurityContext context,
     BranchWPConfiguration config, RepositoryHookEvent event)
   {
-    Set<BranchWPPermission> permissions = config.getPermissions();
-
-    if (!permissions.isEmpty())
+    if (!config.isPermissionConfigEmpty())
     {
       Repository repository = event.getRepository();
 
       for (Changeset changeset : event.getChangesets())
       {
-        if (!isPrivileged(context, repository, permissions, changeset))
+        if (!isPrivileged(context, repository, config, changeset))
         {
           if (logger.isWarnEnabled())
           {
             logger.warn("access denied for branch {}", changeset.getBranches());
           }
 
-          throw new BranchWPException("no permissions to write to branch");
+          throw new BranchWPException("no write permissions for the branch");
         }
       }
     }
@@ -217,7 +276,7 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
    */
   private String getBranchName(String type, List<String> branches)
   {
-    String branch = null;
+    String branch;
 
     if (branches.isEmpty() && TYPE_HG.equals(type))
     {
@@ -229,6 +288,77 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
     }
 
     return branch;
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @param config
+   * @param changeset
+   * @param branch
+   * @param context
+   * @param username
+   *
+   * @return
+   */
+  private boolean isChangesetAllowed(BranchWPConfiguration config,
+    Changeset changeset, String branch, WebSecurityContext context,
+    String username)
+  {
+    boolean allowed = false;
+
+    logger.trace("check allow permissions of user {} for branch {}", username,
+      branch);
+
+    for (BranchWPPermission bwp : config.getAllowPermissions())
+    {
+      if (isPermissionMatching(bwp, branch, context, username))
+      {
+        logger.trace("changeset {} granted by {}", changeset.getId(), bwp);
+
+        allowed = true;
+
+        break;
+      }
+    }
+
+    return allowed;
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @param config
+   * @param changeset
+   * @param branch
+   * @param context
+   * @param username
+   *
+   * @return
+   */
+  private boolean isChangesetDenied(BranchWPConfiguration config,
+    Changeset changeset, String branch, WebSecurityContext context,
+    String username)
+  {
+    boolean denied = false;
+
+    logger.trace("check deny permissions of user {} for branch {}", username,
+      branch);
+
+    for (BranchWPPermission bwp : config.getDenyPermissions())
+    {
+      if (isPermissionMatching(bwp, branch, context, username))
+      {
+        logger.trace("changeset {} denied by {}", changeset.getId(), bwp);
+        denied = true;
+
+        break;
+      }
+    }
+
+    return denied;
   }
 
   /**
@@ -276,78 +406,25 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
    * Method description
    *
    *
-   *
+   * @param bwp
+   * @param branch
    * @param context
-   * @param repository
-   * @param permissions
-   * @param c
-   * @param changeset
+   * @param username
    *
    * @return
    */
-  private boolean isPrivileged(WebSecurityContext context,
-    Repository repository, Set<BranchWPPermission> permissions,
-    Changeset changeset)
+  private boolean isPermissionMatching(BranchWPPermission bwp, String branch,
+    WebSecurityContext context, String username)
   {
-    boolean privileged = false;
-
-    String type = repository.getType();
-
-    List<String> branches = changeset.getBranches();
-
-    if (branches.isEmpty() && TYPE_GIT.equals(type))
-    {
-      if (logger.isTraceEnabled())
-      {
-        logger.trace(
-          "git changeset {} is no repository head and has no branch informations",
-          changeset.getId());
-      }
-
-      privileged = true;
-    }
-    else
-    {
-      String username = context.getUser().getName();
-
-      String branch = getBranchName(type, branches);
-
-      if (logger.isTraceEnabled())
-      {
-        logger.trace("check write permission of user {} for branch {}",
-          username, branch);
-      }
-
-      for (BranchWPPermission bwp : permissions)
-      {
-        //J-
-        if (GlobUtil.matches(bwp.getBranch(), branch)
+    //J-
+    return GlobUtil.matches(bwp.getBranch(), branch)
            && ((bwp.isGroup() && context.getGroups().contains(bwp.getName()))
-           || (!bwp.isGroup() && username.equals(bwp.getName()))))
-        {
-          if ( logger.isTraceEnabled() )
-          {
-            logger.trace("changeset {} granted by {}", changeset.getId(), bwp);
-          }
-          
-          privileged = true;
-          break;
-        }
-        //J+
-      }
-
-      if (!privileged && logger.isWarnEnabled())
-      {
-        logger.warn("access denied for user {} at branch {}", username, branch);
-      }
-
-    }
-
-    return privileged;
+           || (!bwp.isGroup() && username.equals(bwp.getName())));
+    //J+
   }
 
   //~--- fields ---------------------------------------------------------------
 
   /** Field description */
-  private Provider<WebSecurityContext> securityContextProvider;
+  private final Provider<WebSecurityContext> securityContextProvider;
 }

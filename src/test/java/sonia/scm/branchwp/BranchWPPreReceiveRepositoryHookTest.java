@@ -72,6 +72,36 @@ public class BranchWPPreReceiveRepositoryHookTest
    *
    */
   @Test
+  public void testAllAllowed()
+  {
+    BranchWPPreReceiveRepositoryHook hook = createHook(false, "hitchecker");
+    Changeset c = createChangeset("0", "master");
+    Changeset c2 = createChangeset("1", "devel");
+
+    hook.onEvent(createHookEvent("*,@hitchecker", true, false, c, c2));
+  }
+
+  /**
+   * Method description
+   *
+   */
+  @Test(expected = BranchWPException.class)
+  public void testAllAllowedButOneDenied()
+  {
+    BranchWPPreReceiveRepositoryHook hook = createHook(false, "hitchecker");
+    Changeset c = createChangeset("0", "master");
+    Changeset c2 = createChangeset("1", "devel");
+    Changeset c3 = createChangeset("2", "feature-x");
+
+    hook.onEvent(createHookEvent("*,@hitchecker;!feature-x,@hitchecker", true,
+      false, c, c2, c3));
+  }
+
+  /**
+   * Method description
+   *
+   */
+  @Test
   public void testAsAdmin()
   {
     BranchWPPreReceiveRepositoryHook hook = createHook(true);
@@ -91,6 +121,19 @@ public class BranchWPPreReceiveRepositoryHookTest
     Changeset c = createChangeset("0", "master");
 
     hook.onEvent(createHookEvent("", true, true, c));
+  }
+
+  /**
+   * Method description
+   *
+   */
+  @Test(expected = BranchWPException.class)
+  public void testDenied()
+  {
+    BranchWPPreReceiveRepositoryHook hook = createHook(false, "hitchecker");
+    Changeset c = createChangeset("0", "master");
+
+    hook.onEvent(createHookEvent("!master,@hitchecker", true, false, c));
   }
 
   /**
@@ -117,6 +160,20 @@ public class BranchWPPreReceiveRepositoryHookTest
     Changeset c = createChangeset("0", "master");
 
     hook.onEvent(createHookEvent("", true, false, c));
+  }
+
+  /**
+   * Method description
+   *
+   */
+  @Test(expected = BranchWPException.class)
+  public void testGlobDenied()
+  {
+    BranchWPPreReceiveRepositoryHook hook = createHook(false, "hitchecker");
+    Changeset c = createChangeset("0", "master");
+
+    hook.onEvent(createHookEvent("*,@hitchecker;!*ter,@hitchecker", true,
+      false, c));
   }
 
   /**

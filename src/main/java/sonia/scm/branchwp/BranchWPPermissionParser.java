@@ -30,14 +30,18 @@
  */
 
 
+
 package sonia.scm.branchwp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import sonia.scm.branchwp.BranchWPPermission.Type;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -68,33 +72,45 @@ public class BranchWPPermissionParser
    */
   public static void parse(Set<BranchWPPermission> permissions, String property)
   {
-    if (logger.isTraceEnabled())
-    {
-      logger.trace("try to parse permissions string {}", property);
-    }
+    parse(permissions, permissions, property);
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @param allowPermissions
+   * @param denyPermissions
+   * @param property
+   */
+  public static void parse(Set<BranchWPPermission> allowPermissions,
+    Set<BranchWPPermission> denyPermissions, String property)
+  {
+    logger.trace("try to parse permissions string {}", property);
 
     Iterable<String> permissionStrings =
       Splitter.on(";").omitEmptyStrings().trimResults().split(property);
 
     for (String permissionString : permissionStrings)
     {
-      if (logger.isTraceEnabled())
-      {
-        logger.trace("try to parse permission string {}", permissionString);
-      }
+      logger.trace("try to parse permission string {}", permissionString);
 
       BranchWPPermission permission = parsePermission(permissionString);
 
       if (permission != null)
       {
-        if (logger.isDebugEnabled())
-        {
-          logger.debug("append branchwp permission {}", permission);
-        }
+        logger.debug("append branchwp permission {}", permission);
 
-        permissions.add(permission);
+        if (permission.getType() == Type.DENY)
+        {
+          denyPermissions.add(permission);
+        }
+        else
+        {
+          allowPermissions.add(permission);
+        }
       }
-      else if (logger.isWarnEnabled())
+      else
       {
         logger.warn("failed to parse permission string {}", permissionString);
       }
@@ -109,7 +125,8 @@ public class BranchWPPermissionParser
    *
    * @return
    */
-  private static BranchWPPermission parsePermission(String permissionString)
+  @VisibleForTesting
+  static BranchWPPermission parsePermission(String permissionString)
   {
     BranchWPPermission permission = null;
     Iterator<String> parts = Splitter.on(
@@ -118,7 +135,14 @@ public class BranchWPPermissionParser
 
     if (parts.hasNext())
     {
+      Type type = Type.ALLOW;
       String branch = parts.next();
+
+      if (branch.startsWith("!"))
+      {
+        type = Type.DENY;
+        branch = branch.substring(1);
+      }
 
       if (parts.hasNext())
       {
@@ -132,7 +156,7 @@ public class BranchWPPermissionParser
           name = name.substring(1);
         }
 
-        permission = new BranchWPPermission(branch, name, group);
+        permission = new BranchWPPermission(branch, name, group, type);
       }
     }
 
