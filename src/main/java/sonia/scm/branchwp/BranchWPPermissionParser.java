@@ -37,11 +37,13 @@ package sonia.scm.branchwp;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import sonia.scm.branchwp.BranchWPPermission.Type;
+import sonia.scm.user.User;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -54,6 +56,12 @@ import java.util.Set;
  */
 public class BranchWPPermissionParser
 {
+
+  /** Field description */
+  public static final String VAR_MAIL = "\\{mail\\}";
+
+  /** Field description */
+  public static final String VAR_USERNAME = "\\{username\\}";
 
   /**
    * the logger for BranchWPPermissionParser
@@ -69,12 +77,13 @@ public class BranchWPPermissionParser
    *
    * @param permissions
    * @param property
+   * @param user
    */
-  public static void parse(Set<BranchWPPermission> permissions, String property)
+  public static void parse(Set<BranchWPPermission> permissions, String property, User user)
   {
-    parse(permissions, permissions, property);
+    parse(permissions, permissions, property, user);
   }
-
+  
   /**
    * Method description
    *
@@ -82,9 +91,10 @@ public class BranchWPPermissionParser
    * @param allowPermissions
    * @param denyPermissions
    * @param property
+   * @param user
    */
   public static void parse(Set<BranchWPPermission> allowPermissions,
-    Set<BranchWPPermission> denyPermissions, String property)
+    Set<BranchWPPermission> denyPermissions, String property, User user)
   {
     logger.trace("try to parse permissions string {}", property);
 
@@ -128,6 +138,22 @@ public class BranchWPPermissionParser
   @VisibleForTesting
   static BranchWPPermission parsePermission(String permissionString)
   {
+    return parsePermission(null, permissionString);
+  }
+
+  /**
+   * Method description
+   *
+   *
+   *
+   * @param user
+   * @param permissionString
+   *
+   * @return
+   */
+  @VisibleForTesting
+  static BranchWPPermission parsePermission(User user, String permissionString)
+  {
     BranchWPPermission permission = null;
     Iterator<String> parts = Splitter.on(
                                ",").omitEmptyStrings().trimResults().split(
@@ -136,12 +162,25 @@ public class BranchWPPermissionParser
     if (parts.hasNext())
     {
       Type type = Type.ALLOW;
-      String branch = parts.next();
+      String branchPattern = parts.next();
 
-      if (branch.startsWith("!"))
+      if (branchPattern.startsWith("!"))
       {
         type = Type.DENY;
-        branch = branch.substring(1);
+        branchPattern = branchPattern.substring(1);
+      }
+
+      String branch = branchPattern;
+
+      if (user != null)
+      {
+        //J-
+        branch = branchPattern.replaceAll(
+          VAR_USERNAME, Strings.nullToEmpty(user.getName())
+        ).replaceAll(
+          VAR_MAIL, Strings.nullToEmpty(user.getMail())
+        );
+        //J+
       }
 
       if (parts.hasNext())
@@ -156,7 +195,8 @@ public class BranchWPPermissionParser
           name = name.substring(1);
         }
 
-        permission = new BranchWPPermission(branch, name, group, type);
+        permission = new BranchWPPermission(branchPattern, branch, name, group,
+          type);
       }
     }
 

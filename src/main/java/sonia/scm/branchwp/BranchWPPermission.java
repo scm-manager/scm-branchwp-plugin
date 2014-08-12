@@ -86,6 +86,23 @@ public class BranchWPPermission implements Serializable
   public BranchWPPermission(String branch, String name, boolean group,
     Type type)
   {
+    this(branch, branch, name, group, type);
+  }
+
+  /**
+   * Constructs ...
+   *
+   *
+   * @param branchPattern
+   * @param branch
+   * @param name
+   * @param group
+   * @param type
+   */
+  public BranchWPPermission(String branchPattern, String branch, String name,
+    boolean group, Type type)
+  {
+    this.branchPattern = branchPattern;
     this.branch = branch;
     this.name = name;
     this.group = group;
@@ -118,7 +135,8 @@ public class BranchWPPermission implements Serializable
     final BranchWPPermission other = (BranchWPPermission) obj;
 
     //J-
-    return Objects.equal(branch, other.branch)
+    return Objects.equal(branchPattern, other.branchPattern)
+      && Objects.equal(branch, other.branch)
       && Objects.equal(name, other.name) 
       && Objects.equal(group, other.group)
       && Objects.equal(type, other.type);
@@ -134,7 +152,7 @@ public class BranchWPPermission implements Serializable
   @Override
   public int hashCode()
   {
-    return Objects.hashCode(branch, name, group, type);
+    return Objects.hashCode(branchPattern, branch, name, group, type);
   }
 
   /**
@@ -148,6 +166,7 @@ public class BranchWPPermission implements Serializable
   {
     //J-
     return Objects.toStringHelper(this)
+                  .add("branchPattern", branchPattern)
                   .add("branch", branch)
                   .add("name", name)
                   .add("group", group)
@@ -167,6 +186,17 @@ public class BranchWPPermission implements Serializable
   public String getBranch()
   {
     return branch;
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @return
+   */
+  public String getBranchPattern()
+  {
+    return branchPattern;
   }
 
   /**
@@ -206,6 +236,9 @@ public class BranchWPPermission implements Serializable
 
   /** Field description */
   private final String branch;
+
+  /** Field description */
+  private final String branchPattern;
 
   /** Field description */
   private final boolean group;

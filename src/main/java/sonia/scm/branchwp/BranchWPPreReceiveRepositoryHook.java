@@ -118,7 +118,7 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
       if (!isOwnerOrAdmin(context, user, repository))
       {
 
-        BranchWPConfiguration config = new BranchWPConfiguration(repository);
+        BranchWPConfiguration config = new BranchWPConfiguration(repository, user);
 
         if (config.isEnabled())
         {

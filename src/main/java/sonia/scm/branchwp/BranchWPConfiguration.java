@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import sonia.scm.PropertiesAware;
+import sonia.scm.user.User;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -81,7 +82,20 @@ public class BranchWPConfiguration implements Serializable
    */
   public BranchWPConfiguration(PropertiesAware properties)
   {
+    this(properties, null);
+  }
+
+  /**
+   * Constructs ...
+   *
+   *
+   * @param properties
+   * @param user
+   */
+  public BranchWPConfiguration(PropertiesAware properties, User user)
+  {
     this.properties = properties;
+    this.user = user;
     enabled = Boolean.valueOf(properties.getProperty(PROPERTY_ENABLED));
   }
 
@@ -162,7 +176,7 @@ public class BranchWPConfiguration implements Serializable
     if (!Strings.isNullOrEmpty(property))
     {
       BranchWPPermissionParser.parse(allowPermissions, denyPermissions,
-        property);
+        property, user);
     }
     else if (logger.isDebugEnabled())
     {
@@ -174,6 +188,9 @@ public class BranchWPConfiguration implements Serializable
 
   /** Field description */
   private final PropertiesAware properties;
+
+  /** Field description */
+  private final User user;
 
   /** Field description */
   private Set<BranchWPPermission> allowPermissions;

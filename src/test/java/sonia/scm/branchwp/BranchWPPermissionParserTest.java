@@ -40,6 +40,8 @@ import com.google.common.collect.Sets;
 import org.junit.Test;
 
 import sonia.scm.branchwp.BranchWPPermission.Type;
+import sonia.scm.user.User;
+import sonia.scm.user.UserTestData;
 
 import static org.junit.Assert.*;
 
@@ -65,7 +67,7 @@ public class BranchWPPermissionParserTest
 
     String p = "master,@heartofgold";
 
-    BranchWPPermissionParser.parse(permissions, p);
+    BranchWPPermissionParser.parse(permissions, p, trillian);
 
     assertEquals(1, permissions.size());
 
@@ -88,7 +90,7 @@ public class BranchWPPermissionParserTest
 
     String p = "default,@hitchecker;master,trillian";
 
-    BranchWPPermissionParser.parse(permissions, p);
+    BranchWPPermissionParser.parse(permissions, p, trillian);
     assertEquals(2, permissions.size());
 
     for (BranchWPPermission perm : permissions)
@@ -121,7 +123,7 @@ public class BranchWPPermissionParserTest
 
     String p = "default,perfect";
 
-    BranchWPPermissionParser.parse(permissions, p);
+    BranchWPPermissionParser.parse(permissions, p, trillian);
 
     assertEquals(1, permissions.size());
 
@@ -147,4 +149,28 @@ public class BranchWPPermissionParserTest
     perm = BranchWPPermissionParser.parsePermission("!default,perfect");
     assertEquals(Type.DENY, perm.getType());
   }
+
+  /**
+   * Method description
+   *
+   */
+  @Test
+  public void testParseVariablePermission()
+  {
+    String p = "{username}/development,trillian";
+    BranchWPPermission bwp = BranchWPPermissionParser.parsePermission(trillian,
+                               p);
+
+    assertEquals("{username}/development", bwp.getBranchPattern());
+    assertEquals(trillian.getName() + "/development", bwp.getBranch());
+    p = "{mail}/development,trillian";
+    bwp = BranchWPPermissionParser.parsePermission(trillian, p);
+    assertEquals("{mail}/development", bwp.getBranchPattern());
+    assertEquals(trillian.getMail() + "/development", bwp.getBranch());
+  }
+
+  //~--- fields ---------------------------------------------------------------
+
+  /** Field description */
+  private final User trillian = UserTestData.createTrillian();
 }
