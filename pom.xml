@@ -35,6 +35,18 @@
     </dependency>
 
   </dependencies>
+  
+  <build>
+    <plugins>
+      
+      <plugin>
+        <groupId>sonia.scm.maven</groupId>
+        <artifactId>scm-maven-plugin</artifactId>
+        <version>1.40</version>
+      </plugin>
+      
+    </plugins>
+  </build>
 
   <repositories>
     
