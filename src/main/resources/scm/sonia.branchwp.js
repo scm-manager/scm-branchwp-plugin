@@ -99,7 +99,7 @@ Sonia.branchwp.ConfigPanel = Ext.extend(Sonia.repository.PropertiesFormPanel, {
         id: 'deny',
         dataIndex: 'deny',
         xtype: 'checkcolumn',
-        header: this.colDisallowText,
+        header: this.colDenyText,
         width: 40,
         editable: true
       }]
