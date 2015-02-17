@@ -36,6 +36,7 @@ package sonia.scm.branchwp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 import com.google.common.eventbus.Subscribe;
 
 import org.apache.shiro.SecurityUtils;
@@ -159,7 +160,7 @@ public class BranchWPPreReceiveRepositoryHook
     {
       logger.warn("access denied for branch {}", branch);
 
-      throw new BranchWPException("no write permissions for the branch");
+      throw new BranchWPException("no write permissions for the branch ".concat(branch));
     }
   }
 
@@ -200,8 +201,40 @@ public class BranchWPPreReceiveRepositoryHook
       {
         logger.warn("access denied for branch {}", changeset.getBranches());
 
-        throw new BranchWPException("no write permissions for the branch");
+        throw new BranchWPException(
+          "no write permissions for one of the following branches: ".concat(
+            Joiner.on(", ").join(changeset.getBranches())
+          )
+        );
       }
+    }
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @param ctx
+   * @param event
+   * @param hookCtx
+   */
+  private void checkWithHookContext(BranchWPContext ctx,
+    PreReceiveRepositoryHookEvent event, HookContext hookCtx)
+  {
+    if (hookCtx.isFeatureSupported(HookFeature.BRANCH_PROVIDER))
+    {
+      logger.trace("use hook branch provider to check permissions");
+      checkBranchProvider(ctx, hookCtx.getBranchProvider());
+    }
+    else if (hookCtx.isFeatureSupported(HookFeature.CHANGESET_PROVIDER))
+    {
+      logger.trace("use hook changeset provider to check permissions");
+      checkChangesets(ctx, hookCtx.getChangesetProvider().getChangesets());
+    }
+    else
+    {
+      logger.trace("use changesets provided by event to check permissions");
+      checkChangesets(ctx, event.getChangesets());
     }
   }
 
@@ -228,23 +261,7 @@ public class BranchWPPreReceiveRepositoryHook
 
       if (event.isContextAvailable())
       {
-        HookContext hookCtx = event.getContext();
-
-        if (hookCtx.isFeatureSupported(HookFeature.BRANCH_PROVIDER))
-        {
-          logger.trace("use hook branch provider to check permissions");
-          checkBranchProvider(ctx, hookCtx.getBranchProvider());
-        }
-        else if (hookCtx.isFeatureSupported(HookFeature.CHANGESET_PROVIDER))
-        {
-          logger.trace("use hook changeset provider to check permissions");
-          checkChangesets(ctx, hookCtx.getChangesetProvider().getChangesets());
-        }
-        else
-        {
-          logger.trace("use changesets provided by event to check permissions");
-          checkChangesets(ctx, event.getChangesets());
-        }
+        checkWithHookContext(ctx, event, event.getContext());
       }
       else
       {

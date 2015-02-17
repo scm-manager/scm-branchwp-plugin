@@ -46,40 +46,11 @@ public class BranchWPException extends RuntimeException
   /**
    * Constructs ...
    *
-   */
-  public BranchWPException() {}
-
-  /**
-   * Constructs ...
-   *
    *
    * @param message
    */
   public BranchWPException(String message)
   {
     super(message);
-  }
-
-  /**
-   * Constructs ...
-   *
-   *
-   * @param cause
-   */
-  public BranchWPException(Throwable cause)
-  {
-    super(cause);
-  }
-
-  /**
-   * Constructs ...
-   *
-   *
-   * @param message
-   * @param cause
-   */
-  public BranchWPException(String message, Throwable cause)
-  {
-    super(message, cause);
   }
 }
