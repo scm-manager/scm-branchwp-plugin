@@ -37,8 +37,6 @@ package sonia.scm.branchwp;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -51,11 +49,11 @@ import sonia.scm.event.Subscriber;
 import sonia.scm.plugin.ext.Extension;
 import sonia.scm.repository.Changeset;
 import sonia.scm.repository.PermissionType;
-import sonia.scm.repository.PermissionUtil;
-import sonia.scm.repository.PreReceiveRepositoryHook;
 import sonia.scm.repository.PreReceiveRepositoryHookEvent;
 import sonia.scm.repository.Repository;
-import sonia.scm.repository.RepositoryHookEvent;
+import sonia.scm.repository.api.HookBranchProvider;
+import sonia.scm.repository.api.HookContext;
+import sonia.scm.repository.api.HookFeature;
 import sonia.scm.security.RepositoryPermission;
 import sonia.scm.user.User;
 
@@ -90,39 +88,28 @@ public class BranchWPPreReceiveRepositoryHook
 
     if (repository != null)
     {
-      if (logger.isTraceEnabled())
-      {
-        logger.trace("received hook for repository {}", repository.getName());
-      }
+      logger.trace("received hook for repository {}", repository.getName());
 
       Subject subject = getSubject();
 
-      if (logger.isTraceEnabled())
-      {
-        logger.trace("check branchwp for user {} and repository {}",
-          subject.getPrincipal(), repository.getName());
-      }
+      logger.trace("check branchwp for user {} and repository {}",
+        subject.getPrincipal(), repository.getName());
 
-      if (!subject.isPermitted(new RepositoryPermission(repository,
-        PermissionType.OWNER)))
+      if (!subject.isPermitted(owner(repository)))
       {
-
         User user = subject.getPrincipals().oneByType(User.class);
         BranchWPConfiguration config = new BranchWPConfiguration(repository,
                                          user);
 
         if (config.isEnabled())
         {
-          if (logger.isDebugEnabled())
-          {
-            logger.debug("branchwp is enabled for repository {}",
-              repository.getName());
-          }
+          logger.debug("branchwp is enabled for repository {}",
+            repository.getName());
 
           handleBranchWP(subject, user, config, event);
 
         }
-        else if (logger.isDebugEnabled())
+        else
         {
           logger.debug("branchwp is disabled for repository {}",
             repository.getName());
@@ -136,7 +123,7 @@ public class BranchWPPreReceiveRepositoryHook
           subject.getPrincipal(), repository.getName());
       }
     }
-    else if (logger.isWarnEnabled())
+    else
     {
       logger.warn("received hook without repository");
     }
@@ -163,6 +150,65 @@ public class BranchWPPreReceiveRepositoryHook
    * Method description
    *
    *
+   * @param ctx
+   * @param branch
+   */
+  private void checkBranch(BranchWPContext ctx, String branch)
+  {
+    if (!ctx.isPrivileged(branch))
+    {
+      logger.warn("access denied for branch {}", branch);
+
+      throw new BranchWPException("no write permissions for the branch");
+    }
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @param ctx
+   * @param branchProvider
+   */
+  private void checkBranchProvider(BranchWPContext ctx,
+    HookBranchProvider branchProvider)
+  {
+    for (String branch : branchProvider.getCreatedOrModified())
+    {
+      checkBranch(ctx, branch);
+    }
+
+    for (String branch : branchProvider.getDeletedOrClosed())
+    {
+      checkBranch(ctx, branch);
+    }
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @param ctx
+   * @param changesets
+   */
+  private void checkChangesets(BranchWPContext ctx,
+    Iterable<Changeset> changesets)
+  {
+    for (Changeset changeset : changesets)
+    {
+      if (!ctx.isPrivileged(changeset))
+      {
+        logger.warn("access denied for branch {}", changeset.getBranches());
+
+        throw new BranchWPException("no write permissions for the branch");
+      }
+    }
+  }
+
+  /**
+   * Method description
+   *
+   *
    * @param context
    *
    * @param subject
@@ -180,27 +226,51 @@ public class BranchWPPreReceiveRepositoryHook
       BranchWPContext ctx = new BranchWPContext(subject, user, repository,
                               config);
 
-      for (Changeset changeset : event.getChangesets())
+      if (event.isContextAvailable())
       {
-        if (!ctx.isPrivileged(changeset))
-        {
-          if (logger.isWarnEnabled())
-          {
-            logger.warn("access denied for branch {}", changeset.getBranches());
-          }
+        HookContext hookCtx = event.getContext();
 
-          throw new BranchWPException("no write permissions for the branch");
+        if (hookCtx.isFeatureSupported(HookFeature.BRANCH_PROVIDER))
+        {
+          logger.trace("use hook branch provider to check permissions");
+          checkBranchProvider(ctx, hookCtx.getBranchProvider());
+        }
+        else if (hookCtx.isFeatureSupported(HookFeature.CHANGESET_PROVIDER))
+        {
+          logger.trace("use hook changeset provider to check permissions");
+          checkChangesets(ctx, hookCtx.getChangesetProvider().getChangesets());
+        }
+        else
+        {
+          logger.trace("use changesets provided by event to check permissions");
+          checkChangesets(ctx, event.getChangesets());
         }
       }
+      else
+      {
+        logger.trace("use changesets provided by event to check permissions");
+        checkChangesets(ctx, event.getChangesets());
+      }
+
     }
     else
     {
-      if (logger.isWarnEnabled())
-      {
-        logger.warn("branchwp permissions are empty, access denied");
-      }
+      logger.warn("branchwp permissions are empty, access denied");
 
       throw new BranchWPException("no branchwp permissions defined");
     }
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @param repository
+   *
+   * @return
+   */
+  private RepositoryPermission owner(Repository repository)
+  {
+    return new RepositoryPermission(repository, PermissionType.OWNER);
   }
 }

@@ -40,7 +40,6 @@ import com.github.sdorra.shiro.SubjectAware;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.inject.Provider;
 
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
@@ -56,19 +55,26 @@ import sonia.scm.repository.Changeset;
 import sonia.scm.repository.Permission;
 import sonia.scm.repository.PermissionType;
 import sonia.scm.repository.Person;
+import sonia.scm.repository.PreProcessorUtil;
 import sonia.scm.repository.PreReceiveRepositoryHookEvent;
 import sonia.scm.repository.Repository;
-import sonia.scm.repository.RepositoryHookEvent;
-import sonia.scm.repository.RepositoryHookType;
 import sonia.scm.repository.RepositoryTestData;
+import sonia.scm.repository.api.HookBranchProvider;
+import sonia.scm.repository.api.HookContext;
+import sonia.scm.repository.api.HookContextFactory;
+import sonia.scm.repository.api.HookFeature;
+import sonia.scm.repository.spi.HookChangesetProvider;
+import sonia.scm.repository.spi.HookChangesetRequest;
+import sonia.scm.repository.spi.HookChangesetResponse;
+import sonia.scm.repository.spi.HookContextProvider;
 import sonia.scm.user.User;
 import sonia.scm.user.UserTestData;
-import sonia.scm.web.security.WebSecurityContext;
 
 import static org.mockito.Mockito.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -103,6 +109,21 @@ public class BranchWPPreReceiveRepositoryHookTest
    * Method description
    *
    */
+  @Test
+  public void testAllAllowedBranchProvider()
+  {
+    BranchWPPreReceiveRepositoryHook hook = createHook(false, "hitchecker");
+    List<String> cm = Lists.newArrayList("master");
+    List<String> dc = Lists.newArrayList("devel");
+
+    hook.onEvent(createHookEventBranchProvider("*,@hitchecker", true, false,
+      cm, dc));
+  }
+
+  /**
+   * Method description
+   *
+   */
   @Test(expected = BranchWPException.class)
   public void testAllAllowedButOneDenied()
   {
@@ -111,8 +132,9 @@ public class BranchWPPreReceiveRepositoryHookTest
     Changeset c2 = createChangeset("1", "devel");
     Changeset c3 = createChangeset("2", "feature-x");
 
-    hook.onEvent(createHookEvent("*,@hitchecker;!feature-x,@hitchecker", true,
-      false, c, c2, c3));
+    hook.onEvent(
+      createHookEventChangesetProvider(
+        "*,@hitchecker;!feature-x,@hitchecker", true, false, c, c2, c3));
   }
 
   /**
@@ -125,7 +147,7 @@ public class BranchWPPreReceiveRepositoryHookTest
     BranchWPPreReceiveRepositoryHook hook = createHook(true);
     Changeset c = createChangeset("0", "master");
 
-    hook.onEvent(createHookEvent("", true, false, c));
+    hook.onEvent(createHookEventChangesetProvider("", true, false, c));
   }
 
   /**
@@ -151,7 +173,8 @@ public class BranchWPPreReceiveRepositoryHookTest
     BranchWPPreReceiveRepositoryHook hook = createHook(false, "hitchecker");
     Changeset c = createChangeset("0", "master");
 
-    hook.onEvent(createHookEvent("!master,@hitchecker", true, false, c));
+    hook.onEvent(createHookEventChangesetProvider("!master,@hitchecker", true,
+      false, c));
   }
 
   /**
@@ -233,6 +256,22 @@ public class BranchWPPreReceiveRepositoryHookTest
 
     hook.onEvent(createHookEvent("master,dent;master,marvin;default,other",
       true, false, c1, c2));
+  }
+
+  /**
+   * Method description
+   *
+   */
+  @Test(expected = BranchWPException.class)
+  public void testMultipleConfigAccessDeniedWithBranchProvider()
+  {
+    BranchWPPreReceiveRepositoryHook hook = createHook(false, "ka", "noother");
+    List<String> cm = Lists.newArrayList("master");
+    List<String> dc = Lists.newArrayList("default");
+
+    hook.onEvent(
+      createHookEventBranchProvider(
+        "master,dent;master,marvin;default,other", true, false, cm, dc));
   }
 
   /**
@@ -360,6 +399,119 @@ public class BranchWPPreReceiveRepositoryHookTest
     PreReceiveRepositoryHookEvent event =
       mock(PreReceiveRepositoryHookEvent.class);
 
+    Repository repository = createRepository(permissions, enabled, owner);
+
+    when(event.getRepository()).thenReturn(repository);
+
+    List<Changeset> changsets = Lists.newArrayList(changesets);
+
+    when(event.getChangesets()).thenReturn(changsets);
+
+    return event;
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @param permissions
+   * @param enabled
+   * @param owner
+   * @param createdOrModified
+   * @param deletedOrClosed
+   *
+   * @return
+   */
+  private PreReceiveRepositoryHookEvent createHookEventBranchProvider(
+    String permissions, boolean enabled, boolean owner,
+    List<String> createdOrModified, List<String> deletedOrClosed)
+  {
+    PreReceiveRepositoryHookEvent event =
+      mock(PreReceiveRepositoryHookEvent.class);
+
+    Repository repository = createRepository(permissions, enabled, owner);
+
+    when(event.getRepository()).thenReturn(repository);
+    when(event.isContextAvailable()).thenReturn(Boolean.TRUE);
+
+    HookBranchProvider branchProvider = mock(HookBranchProvider.class);
+
+    when(branchProvider.getCreatedOrModified()).thenReturn(createdOrModified);
+    when(branchProvider.getDeletedOrClosed()).thenReturn(deletedOrClosed);
+
+    HookContextProvider ctxProvider = mock(HookContextProvider.class);
+
+    when(ctxProvider.getSupportedFeatures()).thenReturn(
+      EnumSet.of(HookFeature.BRANCH_PROVIDER));
+    when(ctxProvider.getBranchProvider()).thenReturn(branchProvider);
+
+    PreProcessorUtil util = mock(PreProcessorUtil.class, CALLS_REAL_METHODS);
+
+    HookContext ctx = new HookContextFactory(util).createContext(ctxProvider,
+                        repository);
+
+    when(event.getContext()).thenReturn(ctx);
+
+    return event;
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @param permissions
+   * @param enabled
+   * @param owner
+   * @param changesets
+   *
+   * @return
+   */
+  private PreReceiveRepositoryHookEvent createHookEventChangesetProvider(
+    String permissions, boolean enabled, boolean owner, Changeset... changesets)
+  {
+    PreReceiveRepositoryHookEvent event =
+      mock(PreReceiveRepositoryHookEvent.class);
+
+    Repository repository = createRepository(permissions, enabled, owner);
+
+    when(event.getRepository()).thenReturn(repository);
+    when(event.isContextAvailable()).thenReturn(Boolean.TRUE);
+
+    HookChangesetProvider changesetProvider = mock(HookChangesetProvider.class);
+
+    when(changesetProvider.handleRequest(
+      any(HookChangesetRequest.class))).thenReturn(
+        new HookChangesetResponse(Lists.newArrayList(changesets)));
+
+    HookContextProvider ctxProvider = mock(HookContextProvider.class);
+
+    when(ctxProvider.getSupportedFeatures()).thenReturn(
+      EnumSet.of(HookFeature.CHANGESET_PROVIDER));
+    when(ctxProvider.getChangesetProvider()).thenReturn(changesetProvider);
+
+    PreProcessorUtil util = mock(PreProcessorUtil.class, CALLS_REAL_METHODS);
+
+    HookContext ctx = new HookContextFactory(util).createContext(ctxProvider,
+                        repository);
+
+    when(event.getContext()).thenReturn(ctx);
+
+    return event;
+  }
+
+  /**
+   * Method description
+   *
+   *
+   * @param permissions
+   * @param enabled
+   * @param owner
+   *
+   * @return
+   */
+  private Repository createRepository(String permissions, boolean enabled,
+    boolean owner)
+  {
     Repository repository = RepositoryTestData.create42Puzzle();
 
     repository.setProperty(BranchWPConfiguration.PROPERTY_ENABLED,
@@ -373,13 +525,7 @@ public class BranchWPPreReceiveRepositoryHookTest
         PermissionType.OWNER)));
     }
 
-    when(event.getRepository()).thenReturn(repository);
-
-    List<Changeset> changsets = Lists.newArrayList(changesets);
-
-    when(event.getChangesets()).thenReturn(changsets);
-
-    return event;
+    return repository;
   }
 
   //~--- inner classes --------------------------------------------------------
@@ -389,7 +535,7 @@ public class BranchWPPreReceiveRepositoryHookTest
    *
    *
    * @version        Enter version here..., 15/02/17
-   * @author         Enter your name here...    
+   * @author         Enter your name here...
    */
   private static class DelegatingAnswer implements Answer<Object>
   {

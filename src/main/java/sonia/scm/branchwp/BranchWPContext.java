@@ -33,9 +33,12 @@ package sonia.scm.branchwp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.apache.shiro.subject.Subject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import sonia.scm.group.GroupNames;
 import sonia.scm.repository.Changeset;
 import sonia.scm.repository.Repository;
 import sonia.scm.user.User;
@@ -44,8 +47,6 @@ import sonia.scm.util.GlobUtil;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
-import org.apache.shiro.subject.Subject;
-import sonia.scm.group.GroupNames;
 
 /**
  *
@@ -94,13 +95,39 @@ public class BranchWPContext
   /**
    * Method description
    *
+   *
+   * @param branch
+   *
+   * @return
+   */
+  public boolean isPrivileged(String branch)
+  {
+    boolean privileged = false;
+    String username = user.getName();
+
+    if (!isChangesetDenied(branch))
+    {
+      privileged = isChangesetAllowed(branch);
+    }
+
+    if (!privileged)
+    {
+      logger.warn("access denied for user {} at branch {}", username, branch);
+    }
+
+    return privileged;
+  }
+
+  /**
+   * Method description
+   *
    * @param changeset
    *
    * @return
    */
   public boolean isPrivileged(Changeset changeset)
   {
-    boolean privileged = false;
+    boolean privileged;
 
     String type = repository.getType();
 
@@ -116,20 +143,9 @@ public class BranchWPContext
     }
     else
     {
-      String username = user.getName();
-
       String branch = getBranchName(type, branches);
 
-      if (!isChangesetDenied(changeset, branch))
-      {
-        privileged = isChangesetAllowed(changeset, branch);
-      }
-
-      if (!privileged)
-      {
-        logger.warn("access denied for user {} at branch {}", username, branch);
-      }
-
+      privileged = isPrivileged(branch);
     }
 
     return privileged;
@@ -164,6 +180,17 @@ public class BranchWPContext
    * Method description
    *
    *
+   * @return
+   */
+  private GroupNames getGroups()
+  {
+    return subject.getPrincipals().oneByType(GroupNames.class);
+  }
+
+  /**
+   * Method description
+   *
+   *
    * @param config
    * @param changeset
    * @param branch
@@ -172,7 +199,7 @@ public class BranchWPContext
    *
    * @return
    */
-  private boolean isChangesetAllowed(Changeset changeset, String branch)
+  private boolean isChangesetAllowed(String branch)
   {
     boolean allowed = false;
 
@@ -183,8 +210,6 @@ public class BranchWPContext
     {
       if (isPermissionMatching(bwp, branch))
       {
-        logger.trace("changeset {} granted by {}", changeset.getId(), bwp);
-
         allowed = true;
 
         break;
@@ -206,7 +231,7 @@ public class BranchWPContext
    *
    * @return
    */
-  private boolean isChangesetDenied(Changeset changeset, String branch)
+  private boolean isChangesetDenied(String branch)
   {
     boolean denied = false;
 
@@ -217,7 +242,7 @@ public class BranchWPContext
     {
       if (isPermissionMatching(bwp, branch))
       {
-        logger.trace("changeset {} denied by {}", changeset.getId(), bwp);
+        logger.trace("changeset {} denied by {}", bwp);
         denied = true;
 
         break;
@@ -246,20 +271,17 @@ public class BranchWPContext
            || (!bwp.isGroup() && user.getName().equals(bwp.getName())));
     //J+
   }
-  
-  private GroupNames getGroups(){
-    return subject.getPrincipals().oneByType(GroupNames.class);
-  }
 
   //~--- fields ---------------------------------------------------------------
 
   /** Field description */
   private final BranchWPConfiguration config;
 
-  private final Subject subject;
-
   /** Field description */
   private final Repository repository;
+
+  /** Field description */
+  private final Subject subject;
 
   /** Field description */
   private final User user;
