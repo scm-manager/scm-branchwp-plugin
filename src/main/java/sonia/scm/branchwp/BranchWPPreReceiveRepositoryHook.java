@@ -35,29 +35,38 @@ package sonia.scm.branchwp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import sonia.scm.EagerSingleton;
+import sonia.scm.event.Subscriber;
 import sonia.scm.plugin.ext.Extension;
 import sonia.scm.repository.Changeset;
 import sonia.scm.repository.PermissionType;
 import sonia.scm.repository.PermissionUtil;
 import sonia.scm.repository.PreReceiveRepositoryHook;
+import sonia.scm.repository.PreReceiveRepositoryHookEvent;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryHookEvent;
+import sonia.scm.security.RepositoryPermission;
 import sonia.scm.user.User;
-import sonia.scm.util.SecurityUtil;
-import sonia.scm.web.security.WebSecurityContext;
 
 /**
  *
  * @author Sebastian Sdorra
  */
 @Extension
-public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
+@EagerSingleton
+@Subscriber(async = false)
+public class BranchWPPreReceiveRepositoryHook
 {
 
   /**
@@ -65,21 +74,6 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
    */
   private static final Logger logger =
     LoggerFactory.getLogger(BranchWPPreReceiveRepositoryHook.class);
-
-  //~--- constructors ---------------------------------------------------------
-
-  /**
-   * Constructs ...
-   *
-   *
-   * @param securityContextProvider
-   */
-  @Inject
-  public BranchWPPreReceiveRepositoryHook(
-    Provider<WebSecurityContext> securityContextProvider)
-  {
-    this.securityContextProvider = securityContextProvider;
-  }
 
   //~--- methods --------------------------------------------------------------
 
@@ -89,8 +83,8 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
    *
    * @param event
    */
-  @Override
-  public void onEvent(RepositoryHookEvent event)
+  @Subscribe
+  public void onEvent(PreReceiveRepositoryHookEvent event)
   {
     Repository repository = event.getRepository();
 
@@ -101,24 +95,21 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
         logger.trace("received hook for repository {}", repository.getName());
       }
 
-      WebSecurityContext context = securityContextProvider.get();
-      User user = context.getUser();
-
-      if (user == null)
-      {
-        throw new IllegalStateException("no user found");
-      }
+      Subject subject = getSubject();
 
       if (logger.isTraceEnabled())
       {
         logger.trace("check branchwp for user {} and repository {}",
-          user.getName(), repository.getName());
+          subject.getPrincipal(), repository.getName());
       }
 
-      if (!isOwnerOrAdmin(context, user, repository))
+      if (!subject.isPermitted(new RepositoryPermission(repository,
+        PermissionType.OWNER)))
       {
 
-        BranchWPConfiguration config = new BranchWPConfiguration(repository, user);
+        User user = subject.getPrincipals().oneByType(User.class);
+        BranchWPConfiguration config = new BranchWPConfiguration(repository,
+                                         user);
 
         if (config.isEnabled())
         {
@@ -128,7 +119,7 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
               repository.getName());
           }
 
-          handleBranchWP(context, config, event);
+          handleBranchWP(subject, user, config, event);
 
         }
         else if (logger.isDebugEnabled())
@@ -138,6 +129,12 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
         }
 
       }
+      else
+      {
+        logger.debug(
+          "skip user {}, because the user has owner permissions for repository {}",
+          subject.getPrincipal(), repository.getName());
+      }
     }
     else if (logger.isWarnEnabled())
     {
@@ -146,24 +143,42 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
 
   }
 
+  //~--- get methods ----------------------------------------------------------
+
   /**
    * Method description
    *
    *
+   * @return
+   */
+  @VisibleForTesting
+  protected Subject getSubject()
+  {
+    return SecurityUtils.getSubject();
+  }
+
+  //~--- methods --------------------------------------------------------------
+
+  /**
+   * Method description
    *
    *
    * @param context
+   *
+   * @param subject
+   * @param user
    * @param config
    * @param event
    */
-  private void handleBranchWP(WebSecurityContext context,
-    BranchWPConfiguration config, RepositoryHookEvent event)
+  private void handleBranchWP(Subject subject, User user,
+    BranchWPConfiguration config, PreReceiveRepositoryHookEvent event)
   {
     if (!config.isPermissionConfigEmpty())
     {
       Repository repository = event.getRepository();
 
-      BranchWPContext ctx = new BranchWPContext(context, repository, config);
+      BranchWPContext ctx = new BranchWPContext(subject, user, repository,
+                              config);
 
       for (Changeset changeset : event.getChangesets())
       {
@@ -188,52 +203,4 @@ public class BranchWPPreReceiveRepositoryHook extends PreReceiveRepositoryHook
       throw new BranchWPException("no branchwp permissions defined");
     }
   }
-
-  //~--- get methods ----------------------------------------------------------
-
-  /**
-   * Method description
-   *
-   *
-   * @param context
-   * @param user
-   * @param repository
-   *
-   * @return
-   */
-  private boolean isOwnerOrAdmin(WebSecurityContext context, User user,
-    Repository repository)
-  {
-    boolean adminOrOwner = false;
-
-    if (SecurityUtil.isAdmin(context))
-    {
-      if (logger.isDebugEnabled())
-      {
-        logger.debug("skip branchwp because the user {} is admin",
-          user.getName());
-      }
-
-      adminOrOwner = true;
-    }
-    else if (PermissionUtil.hasPermission(repository, context,
-      PermissionType.OWNER))
-    {
-      if (logger.isDebugEnabled())
-      {
-        logger.debug(
-          "skip branchwp because the user {} is the owner of the repository {}",
-          user.getName(), repository.getName());
-      }
-
-      adminOrOwner = true;
-    }
-
-    return adminOrOwner;
-  }
-
-  //~--- fields ---------------------------------------------------------------
-
-  /** Field description */
-  private final Provider<WebSecurityContext> securityContextProvider;
 }

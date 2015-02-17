@@ -40,11 +40,12 @@ import sonia.scm.repository.Changeset;
 import sonia.scm.repository.Repository;
 import sonia.scm.user.User;
 import sonia.scm.util.GlobUtil;
-import sonia.scm.web.security.WebSecurityContext;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
+import org.apache.shiro.subject.Subject;
+import sonia.scm.group.GroupNames;
 
 /**
  *
@@ -74,17 +75,18 @@ public class BranchWPContext
    * Constructs ...
    *
    *
-   * @param context
+   * @param subject
+   * @param user
    * @param repository
    * @param config
    */
-  public BranchWPContext(WebSecurityContext context, Repository repository,
+  public BranchWPContext(Subject subject, User user, Repository repository,
     BranchWPConfiguration config)
   {
-    this.context = context;
+    this.subject = subject;
     this.repository = repository;
     this.config = config;
-    this.user = context.getUser();
+    this.user = user;
   }
 
   //~--- get methods ----------------------------------------------------------
@@ -114,7 +116,7 @@ public class BranchWPContext
     }
     else
     {
-      String username = context.getUser().getName();
+      String username = user.getName();
 
       String branch = getBranchName(type, branches);
 
@@ -240,9 +242,13 @@ public class BranchWPContext
   {
     //J-
     return GlobUtil.matches(bwp.getBranch(), branch)
-           && ((bwp.isGroup() && context.getGroups().contains(bwp.getName()))
+           && ((bwp.isGroup() && getGroups().contains(bwp.getName()))
            || (!bwp.isGroup() && user.getName().equals(bwp.getName())));
     //J+
+  }
+  
+  private GroupNames getGroups(){
+    return subject.getPrincipals().oneByType(GroupNames.class);
   }
 
   //~--- fields ---------------------------------------------------------------
@@ -250,8 +256,7 @@ public class BranchWPContext
   /** Field description */
   private final BranchWPConfiguration config;
 
-  /** Field description */
-  private final WebSecurityContext context;
+  private final Subject subject;
 
   /** Field description */
   private final Repository repository;

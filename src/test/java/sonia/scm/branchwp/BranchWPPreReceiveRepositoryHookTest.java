@@ -35,16 +35,28 @@ package sonia.scm.branchwp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import com.github.sdorra.shiro.ShiroRule;
+import com.github.sdorra.shiro.SubjectAware;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Provider;
 
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.Subject;
+
+import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import sonia.scm.group.GroupNames;
 import sonia.scm.repository.Changeset;
 import sonia.scm.repository.Permission;
 import sonia.scm.repository.PermissionType;
 import sonia.scm.repository.Person;
+import sonia.scm.repository.PreReceiveRepositoryHookEvent;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryHookEvent;
 import sonia.scm.repository.RepositoryHookType;
@@ -64,8 +76,14 @@ import java.util.Set;
  *
  * @author Sebastian Sdorra
  */
+@SubjectAware(configuration = "classpath:sonia/scm/branchwp/shiro-001.ini")
 public class BranchWPPreReceiveRepositoryHookTest
 {
+
+  /** Field description */
+  private static final String DUMMY_REALM = "dummy";
+
+  //~--- methods --------------------------------------------------------------
 
   /**
    * Method description
@@ -294,17 +312,33 @@ public class BranchWPPreReceiveRepositoryHookTest
 
     marvin.setAdmin(admin);
 
-    WebSecurityContext context = mock(WebSecurityContext.class);
+    GroupNames groupNames = new GroupNames(Lists.newArrayList(groups));
 
-    when(context.getUser()).thenReturn(marvin);
-    when(context.getGroups()).thenReturn(groupSet);
-    when(context.isAuthenticated()).thenReturn(true);
+    SimplePrincipalCollection principals = new SimplePrincipalCollection();
 
-    Provider<WebSecurityContext> provider = mock(Provider.class);
+    principals.add(marvin.getName(), DUMMY_REALM);
+    principals.add(marvin, DUMMY_REALM);
+    principals.add(groupNames, DUMMY_REALM);
 
-    when(provider.get()).thenReturn(context);
+    Subject s = new Subject.Builder().authenticated(true).principals(
+                  principals).buildSubject();
 
-    return new BranchWPPreReceiveRepositoryHook(provider);
+    final Subject subject = mock(Subject.class, new DelegatingAnswer(s));
+    org.apache.shiro.authz.Permission p =
+      any(org.apache.shiro.authz.Permission.class);
+
+    when(subject.isPermitted(p)).thenReturn(admin);
+
+    return new BranchWPPreReceiveRepositoryHook()
+    {
+
+      @Override
+      protected Subject getSubject()
+      {
+        return subject;
+      }
+
+    };
   }
 
   /**
@@ -320,12 +354,11 @@ public class BranchWPPreReceiveRepositoryHookTest
    *
    * @return
    */
-  private RepositoryHookEvent createHookEvent(String permissions,
+  private PreReceiveRepositoryHookEvent createHookEvent(String permissions,
     boolean enabled, boolean owner, Changeset... changesets)
   {
-    RepositoryHookEvent event = mock(RepositoryHookEvent.class);
-
-    when(event.getType()).thenReturn(RepositoryHookType.PRE_RECEIVE);
+    PreReceiveRepositoryHookEvent event =
+      mock(PreReceiveRepositoryHookEvent.class);
 
     Repository repository = RepositoryTestData.create42Puzzle();
 
@@ -348,4 +381,58 @@ public class BranchWPPreReceiveRepositoryHookTest
 
     return event;
   }
+
+  //~--- inner classes --------------------------------------------------------
+
+  /**
+   * Class description
+   *
+   *
+   * @version        Enter version here..., 15/02/17
+   * @author         Enter your name here...    
+   */
+  private static class DelegatingAnswer implements Answer<Object>
+  {
+
+    /**
+     * Constructs ...
+     *
+     *
+     * @param delegate
+     */
+    public DelegatingAnswer(Object delegate)
+    {
+      this.delegate = delegate;
+    }
+
+    //~--- methods ------------------------------------------------------------
+
+    /**
+     * Method description
+     *
+     *
+     * @param invocation
+     *
+     * @return
+     *
+     * @throws Throwable
+     */
+    @Override
+    public Object answer(InvocationOnMock invocation) throws Throwable
+    {
+      return invocation.getMethod().invoke(delegate, invocation.getArguments());
+    }
+
+    //~--- fields -------------------------------------------------------------
+
+    /** Field description */
+    private final Object delegate;
+  }
+
+
+  //~--- fields ---------------------------------------------------------------
+
+  /** Field description */
+  @Rule
+  public ShiroRule shiro = new ShiroRule();
 }
