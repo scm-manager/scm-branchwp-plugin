@@ -1,19 +1,19 @@
 /**
  * Copyright (c) 2010, Sebastian Sdorra
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * <p>
  * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
  * 3. Neither the name of SCM-Manager; nor the names of its
- *    contributors may be used to endorse or promote products derived from this
- *    software without specific prior written permission.
- *
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,9 +24,8 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * <p>
  * http://bitbucket.org/sdorra/scm-manager
- *
  */
 
 
@@ -35,25 +34,24 @@ package sonia.scm.branchwp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.junit.Test;
-
 import sonia.scm.BasicPropertiesAware;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  * @author Sebastian Sdorra
  */
-public class BranchWPConfigurationTest
-{
+public class BranchWPConfigurationTest {
 
   /**
    * Method description
    *
    */
   @Test
-  public void testEmpty()
-  {
+  public void testEmpty() {
     BasicPropertiesAware properties = new BasicPropertiesAware();
     BranchWPConfiguration cfg = new BranchWPConfiguration(properties);
 
@@ -66,8 +64,7 @@ public class BranchWPConfigurationTest
    *
    */
   @Test
-  public void testEnabled()
-  {
+  public void testEnabled() {
     BasicPropertiesAware properties = new BasicPropertiesAware();
 
     properties.setProperty(BranchWPConfiguration.PROPERTY_ENABLED, "true");
@@ -83,8 +80,7 @@ public class BranchWPConfigurationTest
    *
    */
   @Test
-  public void testPermissions()
-  {
+  public void testPermissions() {
     BasicPropertiesAware properties = new BasicPropertiesAware();
 
     properties.setProperty(BranchWPConfiguration.PROPERTY_ENABLED, "true");

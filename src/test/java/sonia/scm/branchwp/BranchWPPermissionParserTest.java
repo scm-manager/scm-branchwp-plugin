@@ -1,19 +1,19 @@
 /**
  * Copyright (c) 2010, Sebastian Sdorra
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * <p>
  * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
  * 3. Neither the name of SCM-Manager; nor the names of its
- *    contributors may be used to endorse or promote products derived from this
- *    software without specific prior written permission.
- *
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,11 +24,9 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * <p>
  * http://bitbucket.org/sdorra/scm-manager
- *
  */
-
 
 
 package sonia.scm.branchwp;
@@ -36,33 +34,33 @@ package sonia.scm.branchwp;
 //~--- non-JDK imports --------------------------------------------------------
 
 import com.google.common.collect.Sets;
-
 import org.junit.Test;
-
 import sonia.scm.branchwp.BranchWPPermission.Type;
 import sonia.scm.user.User;
 import sonia.scm.user.UserTestData;
 
-import static org.junit.Assert.*;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 //~--- JDK imports ------------------------------------------------------------
-
-import java.util.Set;
 
 /**
  *
  * @author Sebastian Sdorra
  */
-public class BranchWPPermissionParserTest
-{
+public class BranchWPPermissionParserTest {
 
   /**
    * Method description
    *
    */
   @Test
-  public void testParseGroupPermission()
-  {
+  public void testParseGroupPermission() {
     Set<BranchWPPermission> permissions = Sets.newHashSet();
 
     String p = "master,@heartofgold";
@@ -84,8 +82,7 @@ public class BranchWPPermissionParserTest
    *
    */
   @Test
-  public void testParseMultiplePermissions()
-  {
+  public void testParseMultiplePermissions() {
     Set<BranchWPPermission> permissions = Sets.newHashSet();
 
     String p = "default,@hitchecker;master,trillian";
@@ -93,20 +90,14 @@ public class BranchWPPermissionParserTest
     BranchWPPermissionParser.parse(permissions, p, trillian);
     assertEquals(2, permissions.size());
 
-    for (BranchWPPermission perm : permissions)
-    {
-      if (perm.getBranch().equals("default"))
-      {
+    for (BranchWPPermission perm : permissions) {
+      if (perm.getBranch().equals("default")) {
         assertEquals("hitchecker", perm.getName());
         assertTrue(perm.isGroup());
-      }
-      else if (perm.getBranch().equals("master"))
-      {
+      } else if (perm.getBranch().equals("master")) {
         assertEquals("trillian", perm.getName());
         assertFalse(perm.isGroup());
-      }
-      else
-      {
+      } else {
         fail("found unknown branch ".concat(perm.getBranch()));
       }
     }
@@ -117,8 +108,7 @@ public class BranchWPPermissionParserTest
    *
    */
   @Test
-  public void testParsePermission()
-  {
+  public void testParsePermission() {
     Set<BranchWPPermission> permissions = Sets.newHashSet();
 
     String p = "default,perfect";
@@ -140,8 +130,7 @@ public class BranchWPPermissionParserTest
    *
    */
   @Test
-  public void testParsePermissionType()
-  {
+  public void testParsePermissionType() {
     BranchWPPermission perm =
       BranchWPPermissionParser.parsePermission(trillian, "default,perfect");
 
@@ -156,11 +145,10 @@ public class BranchWPPermissionParserTest
    *
    */
   @Test
-  public void testParseVariablePermission()
-  {
+  public void testParseVariablePermission() {
     String p = "{username}/development,trillian";
     BranchWPPermission bwp = BranchWPPermissionParser.parsePermission(trillian,
-                               p);
+      p);
 
     assertEquals("{username}/development", bwp.getBranchPattern());
     assertEquals(trillian.getName() + "/development", bwp.getBranch());

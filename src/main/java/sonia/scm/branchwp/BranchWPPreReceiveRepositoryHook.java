@@ -1,19 +1,19 @@
 /**
  * Copyright (c) 2010, Sebastian Sdorra
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * <p>
  * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
  * 3. Neither the name of SCM-Manager; nor the names of its
- *    contributors may be used to endorse or promote products derived from this
- *    software without specific prior written permission.
- *
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,30 +24,24 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * <p>
  * http://bitbucket.org/sdorra/scm-manager
- *
  */
-
 
 
 package sonia.scm.branchwp;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import com.github.legman.Subscribe;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
-import com.google.common.eventbus.Subscribe;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import sonia.scm.EagerSingleton;
-import sonia.scm.event.Subscriber;
-import sonia.scm.plugin.ext.Extension;
+import sonia.scm.plugin.Extension;
 import sonia.scm.repository.Changeset;
 import sonia.scm.repository.PermissionType;
 import sonia.scm.repository.PreReceiveRepositoryHookEvent;
@@ -64,9 +58,7 @@ import sonia.scm.user.User;
  */
 @Extension
 @EagerSingleton
-@Subscriber(async = false)
-public class BranchWPPreReceiveRepositoryHook
-{
+public class BranchWPPreReceiveRepositoryHook {
 
   /**
    * the logger for BranchwpPreReceiveRepositoryHook
@@ -82,13 +74,11 @@ public class BranchWPPreReceiveRepositoryHook
    *
    * @param event
    */
-  @Subscribe
-  public void onEvent(PreReceiveRepositoryHookEvent event)
-  {
+  @Subscribe(async = false)
+  public void onEvent(PreReceiveRepositoryHookEvent event) {
     Repository repository = event.getRepository();
 
-    if (repository != null)
-    {
+    if (repository != null) {
       logger.trace("received hook for repository {}", repository.getName());
 
       Subject subject = getSubject();
@@ -96,36 +86,28 @@ public class BranchWPPreReceiveRepositoryHook
       logger.trace("check branchwp for user {} and repository {}",
         subject.getPrincipal(), repository.getName());
 
-      if (!subject.isPermitted(owner(repository)))
-      {
+      if (!subject.isPermitted(owner(repository))) {
         User user = subject.getPrincipals().oneByType(User.class);
         BranchWPConfiguration config = new BranchWPConfiguration(repository,
-                                         user);
+          user);
 
-        if (config.isEnabled())
-        {
+        if (config.isEnabled()) {
           logger.debug("branchwp is enabled for repository {}",
             repository.getName());
 
           handleBranchWP(subject, user, config, event);
 
-        }
-        else
-        {
+        } else {
           logger.debug("branchwp is disabled for repository {}",
             repository.getName());
         }
 
-      }
-      else
-      {
+      } else {
         logger.debug(
           "skip user {}, because the user has owner permissions for repository {}",
           subject.getPrincipal(), repository.getName());
       }
-    }
-    else
-    {
+    } else {
       logger.warn("received hook without repository");
     }
 
@@ -140,8 +122,7 @@ public class BranchWPPreReceiveRepositoryHook
    * @return
    */
   @VisibleForTesting
-  protected Subject getSubject()
-  {
+  protected Subject getSubject() {
     return SecurityUtils.getSubject();
   }
 
@@ -154,10 +135,8 @@ public class BranchWPPreReceiveRepositoryHook
    * @param ctx
    * @param branch
    */
-  private void checkBranch(BranchWPContext ctx, String branch)
-  {
-    if (!ctx.isPrivileged(branch))
-    {
+  private void checkBranch(BranchWPContext ctx, String branch) {
+    if (!ctx.isPrivileged(branch)) {
       logger.warn("access denied for branch {}", branch);
 
       throw new BranchWPException("no write permissions for the branch ".concat(branch));
@@ -172,15 +151,12 @@ public class BranchWPPreReceiveRepositoryHook
    * @param branchProvider
    */
   private void checkBranchProvider(BranchWPContext ctx,
-    HookBranchProvider branchProvider)
-  {
-    for (String branch : branchProvider.getCreatedOrModified())
-    {
+                                   HookBranchProvider branchProvider) {
+    for (String branch : branchProvider.getCreatedOrModified()) {
       checkBranch(ctx, branch);
     }
 
-    for (String branch : branchProvider.getDeletedOrClosed())
-    {
+    for (String branch : branchProvider.getDeletedOrClosed()) {
       checkBranch(ctx, branch);
     }
   }
@@ -193,12 +169,9 @@ public class BranchWPPreReceiveRepositoryHook
    * @param changesets
    */
   private void checkChangesets(BranchWPContext ctx,
-    Iterable<Changeset> changesets)
-  {
-    for (Changeset changeset : changesets)
-    {
-      if (!ctx.isPrivileged(changeset))
-      {
+                               Iterable<Changeset> changesets) {
+    for (Changeset changeset : changesets) {
+      if (!ctx.isPrivileged(changeset)) {
         logger.warn("access denied for branch {}", changeset.getBranches());
 
         throw new BranchWPException(
@@ -219,22 +192,17 @@ public class BranchWPPreReceiveRepositoryHook
    * @param hookCtx
    */
   private void checkWithHookContext(BranchWPContext ctx,
-    PreReceiveRepositoryHookEvent event, HookContext hookCtx)
-  {
-    if (hookCtx.isFeatureSupported(HookFeature.BRANCH_PROVIDER))
-    {
+                                    PreReceiveRepositoryHookEvent event, HookContext hookCtx) {
+    if (hookCtx.isFeatureSupported(HookFeature.BRANCH_PROVIDER)) {
       logger.trace("use hook branch provider to check permissions");
       checkBranchProvider(ctx, hookCtx.getBranchProvider());
-    }
-    else if (hookCtx.isFeatureSupported(HookFeature.CHANGESET_PROVIDER))
-    {
+    } else if (hookCtx.isFeatureSupported(HookFeature.CHANGESET_PROVIDER)) {
       logger.trace("use hook changeset provider to check permissions");
       checkChangesets(ctx, hookCtx.getChangesetProvider().getChangesets());
-    }
-    else
-    {
-      logger.trace("use changesets provided by event to check permissions");
-      checkChangesets(ctx, event.getChangesets());
+    } else {
+      // TODO verify this
+//      logger.trace("use changesets provided by event to check permissions");
+//      checkChangesets(ctx, event.getChangesets());
     }
   }
 
@@ -242,7 +210,6 @@ public class BranchWPPreReceiveRepositoryHook
    * Method description
    *
    *
-   * @param context
    *
    * @param subject
    * @param user
@@ -250,28 +217,25 @@ public class BranchWPPreReceiveRepositoryHook
    * @param event
    */
   private void handleBranchWP(Subject subject, User user,
-    BranchWPConfiguration config, PreReceiveRepositoryHookEvent event)
-  {
-    if (!config.isPermissionConfigEmpty())
-    {
+                              BranchWPConfiguration config, PreReceiveRepositoryHookEvent event) {
+    if (!config.isPermissionConfigEmpty()) {
       Repository repository = event.getRepository();
 
       BranchWPContext ctx = new BranchWPContext(subject, user, repository,
-                              config);
+        config);
+      // TODO verify this
+//
+//      if (event.isContextAvailable())
+//      {
+//        checkWithHookContext(ctx, event, event.getContext());
+//      }
+//      else
+//      {
+//        logger.trace("use changesets provided by event to check permissions");
+//        checkChangesets(ctx, event.getChangesets());
+//      }
 
-      if (event.isContextAvailable())
-      {
-        checkWithHookContext(ctx, event, event.getContext());
-      }
-      else
-      {
-        logger.trace("use changesets provided by event to check permissions");
-        checkChangesets(ctx, event.getChangesets());
-      }
-
-    }
-    else
-    {
+    } else {
       logger.warn("branchwp permissions are empty, access denied");
 
       throw new BranchWPException("no branchwp permissions defined");
@@ -286,8 +250,7 @@ public class BranchWPPreReceiveRepositoryHook
    *
    * @return
    */
-  private RepositoryPermission owner(Repository repository)
-  {
+  private RepositoryPermission owner(Repository repository) {
     return new RepositoryPermission(repository, PermissionType.OWNER);
   }
 }

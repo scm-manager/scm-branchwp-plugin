@@ -1,19 +1,19 @@
 /**
  * Copyright (c) 2010, Sebastian Sdorra
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+ * <p>
  * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
  * 3. Neither the name of SCM-Manager; nor the names of its
- *    contributors may be used to endorse or promote products derived from this
- *    software without specific prior written permission.
- *
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -24,11 +24,9 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * <p>
  * http://bitbucket.org/sdorra/scm-manager
- *
  */
-
 
 
 package sonia.scm.branchwp;
@@ -37,25 +35,21 @@ package sonia.scm.branchwp;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import sonia.scm.PropertiesAware;
 import sonia.scm.user.User;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.Serializable;
-
 import java.util.Set;
+
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  *
  * @author Sebastian Sdorra
  */
-public class BranchWPConfiguration implements Serializable
-{
+public class BranchWPConfiguration implements Serializable {
 
   /** Field description */
   static final String PROPERTY_ENABLED = "branchwp.enabled";
@@ -80,8 +74,7 @@ public class BranchWPConfiguration implements Serializable
    *
    * @param properties
    */
-  public BranchWPConfiguration(PropertiesAware properties)
-  {
+  public BranchWPConfiguration(PropertiesAware properties) {
     this(properties, null);
   }
 
@@ -92,8 +85,7 @@ public class BranchWPConfiguration implements Serializable
    * @param properties
    * @param user
    */
-  public BranchWPConfiguration(PropertiesAware properties, User user)
-  {
+  public BranchWPConfiguration(PropertiesAware properties, User user) {
     this.properties = properties;
     this.user = user;
     enabled = Boolean.valueOf(properties.getProperty(PROPERTY_ENABLED));
@@ -107,10 +99,8 @@ public class BranchWPConfiguration implements Serializable
    *
    * @return
    */
-  public Set<BranchWPPermission> getAllowPermissions()
-  {
-    if (allowPermissions == null)
-    {
+  public Set<BranchWPPermission> getAllowPermissions() {
+    if (allowPermissions == null) {
       parsePermissions();
     }
 
@@ -123,10 +113,8 @@ public class BranchWPConfiguration implements Serializable
    *
    * @return
    */
-  public Set<BranchWPPermission> getDenyPermissions()
-  {
-    if (denyPermissions == null)
-    {
+  public Set<BranchWPPermission> getDenyPermissions() {
+    if (denyPermissions == null) {
       parsePermissions();
     }
 
@@ -139,8 +127,7 @@ public class BranchWPConfiguration implements Serializable
    *
    * @return
    */
-  public boolean isEnabled()
-  {
+  public boolean isEnabled() {
     return enabled;
   }
 
@@ -150,10 +137,8 @@ public class BranchWPConfiguration implements Serializable
    *
    * @return
    */
-  public boolean isPermissionConfigEmpty()
-  {
-    if ((allowPermissions == null) || (denyPermissions == null))
-    {
+  public boolean isPermissionConfigEmpty() {
+    if ((allowPermissions == null) || (denyPermissions == null)) {
       parsePermissions();
     }
 
@@ -166,20 +151,16 @@ public class BranchWPConfiguration implements Serializable
    * Method description
    *
    */
-  private void parsePermissions()
-  {
+  private void parsePermissions() {
     allowPermissions = Sets.newHashSet();
     denyPermissions = Sets.newHashSet();
 
     String property = properties.getProperty(PROPERTY_PERMISSIONS);
 
-    if (!Strings.isNullOrEmpty(property))
-    {
+    if (!Strings.isNullOrEmpty(property)) {
       BranchWPPermissionParser.parse(allowPermissions, denyPermissions,
         property, user);
-    }
-    else if (logger.isDebugEnabled())
-    {
+    } else if (logger.isDebugEnabled()) {
       logger.debug("no permissions found");
     }
   }
