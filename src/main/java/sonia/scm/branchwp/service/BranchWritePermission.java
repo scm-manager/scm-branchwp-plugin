@@ -29,68 +29,31 @@
  */
 
 
-package sonia.scm.branchwp;
+package sonia.scm.branchwp.service;
 
-//~--- non-JDK imports --------------------------------------------------------
 
-import org.junit.Test;
-import sonia.scm.BasicPropertiesAware;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.io.Serializable;
+
 
 /**
+ * Write Permission for Branches.
  *
  * @author Sebastian Sdorra
  */
-public class BranchWPConfigurationTest {
+@Getter
+@AllArgsConstructor
+public class BranchWritePermission implements Serializable {
 
-  /**
-   * Method description
-   *
-   */
-  @Test
-  public void testEmpty() {
-    BasicPropertiesAware properties = new BasicPropertiesAware();
-    BranchWPConfiguration cfg = new BranchWPConfiguration(properties);
+  private String branch;
+  private String name;
+  private boolean group;
+  private Type type;
 
-    assertFalse(cfg.isEnabled());
-
+  public enum Type {
+    ALLOW, DENY
   }
 
-  /**
-   * Method description
-   *
-   */
-  @Test
-  public void testEnabled() {
-    BasicPropertiesAware properties = new BasicPropertiesAware();
-
-    properties.setProperty(BranchWPConfiguration.PROPERTY_ENABLED, "true");
-
-    BranchWPConfiguration cfg = new BranchWPConfiguration(properties);
-
-    assertTrue(cfg.isEnabled());
-
-  }
-
-  /**
-   * Method description
-   *
-   */
-  @Test
-  public void testPermissions() {
-    BasicPropertiesAware properties = new BasicPropertiesAware();
-
-    properties.setProperty(BranchWPConfiguration.PROPERTY_ENABLED, "true");
-    properties.setProperty(BranchWPConfiguration.PROPERTY_PERMISSIONS,
-      "master,dent;default,@heartofgold;!master,perfect");
-
-    BranchWPConfiguration cfg = new BranchWPConfiguration(properties);
-
-    assertTrue(cfg.isEnabled());
-    assertEquals(2, cfg.getAllowPermissions().size());
-    assertEquals(1, cfg.getDenyPermissions().size());
-  }
 }

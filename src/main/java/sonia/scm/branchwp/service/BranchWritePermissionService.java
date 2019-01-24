@@ -1,0 +1,116 @@
+package sonia.scm.branchwp.service;
+
+import com.google.common.base.Strings;
+import sonia.scm.group.GroupNames;
+import sonia.scm.repository.Repository;
+import sonia.scm.repository.RepositoryPermissions;
+import sonia.scm.store.ConfigurationStore;
+import sonia.scm.store.ConfigurationStoreFactory;
+import sonia.scm.user.User;
+import sonia.scm.util.AssertUtil;
+import sonia.scm.util.GlobUtil;
+
+import javax.inject.Inject;
+import java.util.function.Supplier;
+
+/**
+ * Store the branch write permissions in the repository store.
+ *
+ * @author Mohamed Karray
+ */
+public class BranchWritePermissionService {
+
+  public static final String VAR_MAIL = "\\{mail\\}";
+  public static final String VAR_USERNAME = "\\{username\\}";
+
+  private ConfigurationStoreFactory storeFactory;
+  private static final String STORE_NAME = "branchWritePermission";
+
+  @Inject
+  public BranchWritePermissionService(ConfigurationStoreFactory storeFactory) {
+    this.storeFactory = storeFactory;
+  }
+
+  /**
+   * The user is is privileged for the given branch
+   * if he or one of his groups has not the DENY permission
+   * and
+   * if he or one of his groups has the Allow permission
+   *
+   * The user is not privileged if there is no permission found for him or one oh his groups.
+   *
+   * @param user
+   * @param userGroups
+   * @param repository
+   * @param branch
+   * @return
+   */
+  public boolean isPrivileged(User user, GroupNames userGroups, Repository repository, String branch) {
+    AssertUtil.assertIsNotNull(user);
+    if (isAdminOrOwner(repository)) {
+      return true;
+    }
+
+    ConfigurationStore<BranchWritePermissions> store = getStore(repository);
+    BranchWritePermissions permissions = store.get();
+    if (!permissions.isEnabled()) {
+      return true;
+    }
+
+    Supplier<Boolean> userAllowed = () -> hasUserPermission(user, branch, permissions, BranchWritePermission.Type.ALLOW);
+    Supplier<Boolean> anyUserGroupsAllowed = () -> hasAnyGroupPermission(userGroups, branch, permissions, BranchWritePermission.Type.ALLOW, user);
+    Supplier<Boolean> userDenied = () -> hasUserPermission(user, branch, permissions, BranchWritePermission.Type.DENY);
+    Supplier<Boolean> anyUserGroupsDenied = () -> hasAnyGroupPermission(userGroups, branch, permissions, BranchWritePermission.Type.DENY, user);
+
+    return !userDenied.get() && !anyUserGroupsDenied.get() && (userAllowed.get() || anyUserGroupsAllowed.get());
+  }
+
+  private boolean isAdminOrOwner(Repository repository) {
+    return RepositoryPermissions.modify(repository).isPermitted();
+  }
+
+  private void checkAdminOrOwner(Repository repository) {
+    RepositoryPermissions.modify(repository).check();
+  }
+
+  private boolean hasAnyGroupPermission(GroupNames userGroups, String branch, BranchWritePermissions permissions, BranchWritePermission.Type type, User user) {
+    return permissions.getPermissions().stream()
+      .filter(branchWritePermission -> matchBranch(branch, branchWritePermission, user))
+      .filter(BranchWritePermission::isGroup)
+      .filter(branchWritePermission -> userGroups.contains(branchWritePermission.getName()))
+      .anyMatch(branchWritePermission -> branchWritePermission.getType().equals(type));
+  }
+
+  private boolean hasUserPermission(User user, String branch, BranchWritePermissions permissions, BranchWritePermission.Type type) {
+    return permissions.getPermissions().stream()
+      .filter(branchWritePermission -> matchBranch(branch, branchWritePermission, user))
+      .filter(branchWritePermission -> !branchWritePermission.isGroup())
+      .filter(branchWritePermission -> user.getName().equals(branchWritePermission.getName()))
+      .anyMatch(branchWritePermission -> branchWritePermission.getType().equals(type));
+  }
+
+  private boolean matchBranch(String branch, BranchWritePermission branchWritePermission, User user) {
+    String branchPattern = branchWritePermission.getBranch();
+    if (user != null) {
+      branchPattern = branchPattern.replaceAll(
+        VAR_USERNAME, Strings.nullToEmpty(user.getName())
+      ).replaceAll(
+        VAR_MAIL, Strings.nullToEmpty(user.getMail())
+      );
+    }
+    return GlobUtil.matches(branchPattern, branch);
+  }
+
+
+  public void setPermission(Repository repository, BranchWritePermission branchWritePermission) {
+    checkAdminOrOwner(repository);
+    ConfigurationStore<BranchWritePermissions> store = getStore(repository);
+    BranchWritePermissions permissions = store.get();
+    permissions.getPermissions().add(branchWritePermission);
+    store.set(permissions);
+  }
+
+  private ConfigurationStore<BranchWritePermissions> getStore(Repository repository) {
+    return storeFactory.withType(BranchWritePermissions.class).withName(STORE_NAME).forRepository(repository).build();
+  }
+}
