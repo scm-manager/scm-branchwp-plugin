@@ -2,6 +2,7 @@ package sonia.scm.branchwp.api;
 
 import de.otto.edison.hal.HalRepresentation;
 import de.otto.edison.hal.Links;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,7 +10,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@EqualsAndHashCode
 @Getter
 @Setter
 @NoArgsConstructor

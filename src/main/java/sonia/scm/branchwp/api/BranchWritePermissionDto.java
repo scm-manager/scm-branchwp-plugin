@@ -1,10 +1,12 @@
 package sonia.scm.branchwp.api;
 
 import de.otto.edison.hal.HalRepresentation;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@EqualsAndHashCode
 @Getter
 @Setter
 @NoArgsConstructor

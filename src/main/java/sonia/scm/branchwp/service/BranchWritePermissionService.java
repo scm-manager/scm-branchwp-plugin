@@ -14,7 +14,7 @@ import sonia.scm.util.AssertUtil;
 import sonia.scm.util.GlobUtil;
 
 import javax.inject.Inject;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 /**
  * Store the branch write permissions in the repository store.
@@ -62,12 +62,12 @@ public class BranchWritePermissionService {
       return true;
     }
 
-    Supplier<Boolean> userAllowed = () -> hasUserPermission(user, branch, permissions, BranchWritePermission.Type.ALLOW);
-    Supplier<Boolean> anyUserGroupsAllowed = () -> hasAnyGroupPermission(userGroups, branch, permissions, BranchWritePermission.Type.ALLOW, user);
-    Supplier<Boolean> userDenied = () -> hasUserPermission(user, branch, permissions, BranchWritePermission.Type.DENY);
-    Supplier<Boolean> anyUserGroupsDenied = () -> hasAnyGroupPermission(userGroups, branch, permissions, BranchWritePermission.Type.DENY, user);
+    BooleanSupplier userAllowed = () -> hasUserPermission(user, branch, permissions, BranchWritePermission.Type.ALLOW);
+    BooleanSupplier anyUserGroupsAllowed = () -> hasAnyGroupPermission(userGroups, branch, permissions, BranchWritePermission.Type.ALLOW, user);
+    BooleanSupplier userDenied = () -> hasUserPermission(user, branch, permissions, BranchWritePermission.Type.DENY);
+    BooleanSupplier anyUserGroupsDenied = () -> hasAnyGroupPermission(userGroups, branch, permissions, BranchWritePermission.Type.DENY, user);
 
-    return !userDenied.get() && !anyUserGroupsDenied.get() && (userAllowed.get() || anyUserGroupsAllowed.get());
+    return !userDenied.getAsBoolean() && !anyUserGroupsDenied.getAsBoolean() && (userAllowed.getAsBoolean() || anyUserGroupsAllowed.getAsBoolean());
   }
 
   public static boolean isPermitted(Repository repository) {
@@ -97,11 +97,8 @@ public class BranchWritePermissionService {
   private boolean matchBranch(String branch, BranchWritePermission branchWritePermission, User user) {
     String branchPattern = branchWritePermission.getBranch();
     if (user != null) {
-      branchPattern = branchPattern.replaceAll(
-        VAR_USERNAME, Strings.nullToEmpty(user.getName())
-      ).replaceAll(
-        VAR_MAIL, Strings.nullToEmpty(user.getMail())
-      );
+      branchPattern = branchPattern.replaceAll(VAR_USERNAME, Strings.nullToEmpty(user.getName()))
+        .replaceAll(VAR_MAIL, Strings.nullToEmpty(user.getMail()));
     }
     return GlobUtil.matches(branchPattern, branch);
   }
@@ -113,7 +110,7 @@ public class BranchWritePermissionService {
   private Repository getRepository(String namespace, String name) {
     Repository repository;
     try (RepositoryService repositoryService = repositoryServiceFactory.create(new NamespaceAndName(namespace, name))) {
-       repository = repositoryService.getRepository();
+      repository = repositoryService.getRepository();
     }
     return repository;
   }
@@ -126,10 +123,11 @@ public class BranchWritePermissionService {
   }
 
   public void setPermissions(String namespace, String name, BranchWritePermissions permissions) {
-    setPermissions(getRepository(namespace, name), permissions );
+    setPermissions(getRepository(namespace, name), permissions);
 
   }
-  public void setPermissions(Repository repository, BranchWritePermissions permissions ) {
+
+  public void setPermissions(Repository repository, BranchWritePermissions permissions) {
     checkPermission(repository);
     ConfigurationStore<BranchWritePermissions> store = getStore(repository);
     store.set(permissions);
