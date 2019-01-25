@@ -70,7 +70,7 @@ public class BranchWritePermissionService {
     return !userDenied.get() && !anyUserGroupsDenied.get() && (userAllowed.get() || anyUserGroupsAllowed.get());
   }
 
-  public boolean isPermitted(Repository repository) {
+  public static boolean isPermitted(Repository repository) {
     return RepositoryPermissions.modify(repository).isPermitted();
   }
 

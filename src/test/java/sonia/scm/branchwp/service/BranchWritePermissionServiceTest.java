@@ -12,7 +12,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import sonia.scm.group.GroupNames;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryTestData;
-import sonia.scm.repository.api.RepositoryService;
 import sonia.scm.store.ConfigurationStore;
 import sonia.scm.store.ConfigurationStoreFactory;
 import sonia.scm.store.InMemoryConfigurationStoreFactory;
