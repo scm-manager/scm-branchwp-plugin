@@ -34,6 +34,8 @@ package sonia.scm.branchwp.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 
@@ -44,7 +46,9 @@ import java.io.Serializable;
  * @author Sebastian Sdorra
  */
 @Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class BranchWritePermission implements Serializable {
 
   private String branch;

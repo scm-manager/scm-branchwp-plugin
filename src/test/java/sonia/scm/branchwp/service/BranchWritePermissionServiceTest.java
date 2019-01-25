@@ -12,6 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import sonia.scm.group.GroupNames;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryTestData;
+import sonia.scm.repository.api.RepositoryService;
 import sonia.scm.store.ConfigurationStore;
 import sonia.scm.store.ConfigurationStoreFactory;
 import sonia.scm.store.InMemoryConfigurationStoreFactory;
@@ -52,7 +53,7 @@ public class BranchWritePermissionServiceTest {
   @Before
   public void init() {
     storeFactory = new InMemoryConfigurationStoreFactory(store);
-    service = new BranchWritePermissionService(storeFactory);
+    service = new BranchWritePermissionService(storeFactory, null);
   }
 
   public BranchWritePermissionServiceTest() {
@@ -62,29 +63,16 @@ public class BranchWritePermissionServiceTest {
     ThreadContext.remove();
   }
 
-  @Test
-  @SubjectAware(username = "admin", password = "secret")
-  public void shouldStorePermissionForAdmin() {
-    when(store.get()).thenReturn(new BranchWritePermissions());
 
-    BranchWritePermission permission = createBranchWritePermission();
-    service.setPermission(REPOSITORY, permission);
-
-    verify(store).set(argThat(argPermissions -> {
-      assertThat(argPermissions.getPermissions()).hasSize(1);
-      assertThat(argPermissions.getPermissions().get(0))
-        .isEqualToComparingFieldByField(createBranchWritePermission());
-      return true;
-    }));
-  }
 
   @Test
   @SubjectAware(username = "owner", password = "secret")
   public void shouldStorePermissionForOwner() {
-    when(store.get()).thenReturn(new BranchWritePermissions());
+    BranchWritePermissions permissions = new BranchWritePermissions();
 
     BranchWritePermission permission = createBranchWritePermission();
-    service.setPermission(REPOSITORY, permission);
+    permissions.getPermissions().add(permission);
+    service.setPermissions(REPOSITORY, permissions);
 
     verify(store).set(argThat(argPermissions -> {
       assertThat(argPermissions.getPermissions()).hasSize(1);
@@ -96,8 +84,12 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldFailOnStoringPermissionForNotAdminOrOwnerUsers() {
+    BranchWritePermissions permissions = new BranchWritePermissions();
+
     BranchWritePermission permission = createBranchWritePermission();
-    assertThatThrownBy(() -> service.setPermission(REPOSITORY, permission)).hasMessage("Subject does not have permission [repository:modify:id-1]");
+    permissions.getPermissions().add(permission);
+
+    assertThatThrownBy(() -> service.setPermissions(REPOSITORY, permissions)).hasMessage("Subject does not have permission [repository:modify:id-1]");
 
     verify(store, never()).set(any());
   }

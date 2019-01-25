@@ -2,8 +2,11 @@ package sonia.scm.branchwp.service;
 
 import com.google.common.base.Strings;
 import sonia.scm.group.GroupNames;
+import sonia.scm.repository.NamespaceAndName;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryPermissions;
+import sonia.scm.repository.api.RepositoryService;
+import sonia.scm.repository.api.RepositoryServiceFactory;
 import sonia.scm.store.ConfigurationStore;
 import sonia.scm.store.ConfigurationStoreFactory;
 import sonia.scm.user.User;
@@ -24,11 +27,13 @@ public class BranchWritePermissionService {
   public static final String VAR_USERNAME = "\\{username\\}";
 
   private ConfigurationStoreFactory storeFactory;
+  private RepositoryServiceFactory repositoryServiceFactory;
   private static final String STORE_NAME = "branchWritePermission";
 
   @Inject
-  public BranchWritePermissionService(ConfigurationStoreFactory storeFactory) {
+  public BranchWritePermissionService(ConfigurationStoreFactory storeFactory, RepositoryServiceFactory repositoryServiceFactory) {
     this.storeFactory = storeFactory;
+    this.repositoryServiceFactory = repositoryServiceFactory;
   }
 
   /**
@@ -36,7 +41,7 @@ public class BranchWritePermissionService {
    * if he or one of his groups has not the DENY permission
    * and
    * if he or one of his groups has the Allow permission
-   *
+   * <p>
    * The user is not privileged if there is no permission found for him or one oh his groups.
    *
    * @param user
@@ -47,7 +52,7 @@ public class BranchWritePermissionService {
    */
   public boolean isPrivileged(User user, GroupNames userGroups, Repository repository, String branch) {
     AssertUtil.assertIsNotNull(user);
-    if (isAdminOrOwner(repository)) {
+    if (isPermitted(repository)) {
       return true;
     }
 
@@ -65,11 +70,11 @@ public class BranchWritePermissionService {
     return !userDenied.get() && !anyUserGroupsDenied.get() && (userAllowed.get() || anyUserGroupsAllowed.get());
   }
 
-  private boolean isAdminOrOwner(Repository repository) {
+  public boolean isPermitted(Repository repository) {
     return RepositoryPermissions.modify(repository).isPermitted();
   }
 
-  private void checkAdminOrOwner(Repository repository) {
+  public void checkPermission(Repository repository) {
     RepositoryPermissions.modify(repository).check();
   }
 
@@ -101,16 +106,32 @@ public class BranchWritePermissionService {
     return GlobUtil.matches(branchPattern, branch);
   }
 
-
-  public void setPermission(Repository repository, BranchWritePermission branchWritePermission) {
-    checkAdminOrOwner(repository);
-    ConfigurationStore<BranchWritePermissions> store = getStore(repository);
-    BranchWritePermissions permissions = store.get();
-    permissions.getPermissions().add(branchWritePermission);
-    store.set(permissions);
-  }
-
   private ConfigurationStore<BranchWritePermissions> getStore(Repository repository) {
     return storeFactory.withType(BranchWritePermissions.class).withName(STORE_NAME).forRepository(repository).build();
+  }
+
+  private Repository getRepository(String namespace, String name) {
+    Repository repository;
+    try (RepositoryService repositoryService = repositoryServiceFactory.create(new NamespaceAndName(namespace, name))) {
+       repository = repositoryService.getRepository();
+    }
+    return repository;
+  }
+
+  public BranchWritePermissions getPermissions(String namespace, String name) {
+    Repository repository = getRepository(namespace, name);
+    checkPermission(repository);
+    ConfigurationStore<BranchWritePermissions> store = getStore(repository);
+    return store.get();
+  }
+
+  public void setPermissions(String namespace, String name, BranchWritePermissions permissions) {
+    setPermissions(getRepository(namespace, name), permissions );
+
+  }
+  public void setPermissions(Repository repository, BranchWritePermissions permissions ) {
+    checkPermission(repository);
+    ConfigurationStore<BranchWritePermissions> store = getStore(repository);
+    store.set(permissions);
   }
 }
