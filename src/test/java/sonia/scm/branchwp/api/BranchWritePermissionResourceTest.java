@@ -36,6 +36,8 @@ public class BranchWritePermissionResourceTest {
     "\"enabled\":true," +
     "\"_links\":{" +
     "\"self\":{" +
+    "\"href\":\"/v2/plugins/branchwp/space/repo\"}," +
+    "\"update\":{" +
     "\"href\":\"/v2/plugins/branchwp/space/repo\"}" +
     "}" +
     "}";

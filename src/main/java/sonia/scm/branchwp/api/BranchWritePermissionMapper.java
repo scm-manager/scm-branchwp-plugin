@@ -13,6 +13,8 @@ import sonia.scm.repository.NamespaceAndName;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
+import static de.otto.edison.hal.Link.link;
+
 @Mapper
 public abstract class BranchWritePermissionMapper {
 
@@ -36,8 +38,10 @@ public abstract class BranchWritePermissionMapper {
 
   @AfterMapping
   void addLinks(@MappingTarget BranchWritePermissionsDto dto, @Context NamespaceAndName namespaceAndName) {
-    dto.add(Links.linkingTo().self(linkBuilder.method("get").parameters(namespaceAndName.getNamespace(), namespaceAndName.getName()).href()).build());
-
+    Links.Builder links = Links.linkingTo();
+    links.self(linkBuilder.method("get").parameters(namespaceAndName.getNamespace(), namespaceAndName.getName()).href());
+    links.single(link("update", linkBuilder.method("put").parameters(namespaceAndName.getNamespace(), namespaceAndName.getName()).href()));
+    dto.add(links.build());
   }
 
 }
