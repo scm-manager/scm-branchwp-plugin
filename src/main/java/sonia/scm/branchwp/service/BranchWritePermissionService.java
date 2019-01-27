@@ -37,18 +37,18 @@ public class BranchWritePermissionService {
   }
 
   /**
-   * The user is is privileged for the given branch
+   * The user is privileged for the given branch
    * if he or one of his groups has not the DENY permission
    * and
-   * if he or one of his groups has the Allow permission
+   * if he or one of his groups has the ALLOW permission
    * <p>
-   * The user is not privileged if there is no permission found for him or one oh his groups.
+   * The user is not privileged if there is no permission found for him or one of his groups.
    *
    * @param user
    * @param userGroups
    * @param repository
    * @param branch
-   * @return
+   * @return true if the user is permitted to write the branch
    */
   public boolean isPrivileged(User user, GroupNames userGroups, Repository repository, String branch) {
     AssertUtil.assertIsNotNull(user);

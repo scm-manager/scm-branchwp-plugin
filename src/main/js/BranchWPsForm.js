@@ -56,13 +56,13 @@ class BranchWPsForm extends React.Component<Props, State> {
   render() {
     const {permissions, enabled} = this.state;
     const {t, readOnly} = this.props;
-    let defaultUserBranWP = {
+    let defaultUserBranchWP = {
       branch: "",
       name: "",
       group: false,
       type: "ALLOW"
     };
-    let defaultGroupBranWP = {
+    let defaultGroupBranchWP = {
       branch: "",
       name: "",
       group: true,
@@ -73,14 +73,14 @@ class BranchWPsForm extends React.Component<Props, State> {
       <Button disabled={readOnly}
               label={t("scm-branchwp-plugin.add-user-permission")}
               action={() => {
-                permissions.push(defaultUserBranWP);
+                permissions.push(defaultUserBranchWP);
                 this.updateBranchWPs(permissions);
               }
               }/>
       <Button disabled={readOnly}
               label={t("scm-branchwp-plugin.add-group-permission")}
               action={() => {
-                permissions.push(defaultGroupBranWP);
+                permissions.push(defaultGroupBranchWP);
                 this.updateBranchWPs(permissions);
               }
               }/>
