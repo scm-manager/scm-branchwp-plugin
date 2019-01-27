@@ -18,25 +18,6 @@
   <name>scm-branchwp-plugin</name>
   <description>This plugin adds branch write protection for repositories.</description>
 
-  <dependencies>
-
-    <!-- test scope -->
-
-    <dependency>
-      <groupId>sonia.scm</groupId>
-      <artifactId>scm-test</artifactId>
-      <version>${project.parent.version}</version>
-      <scope>test</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.github.sdorra</groupId>
-      <artifactId>shiro-unit</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-
-  </dependencies>
-
   <repositories>
     
     <repository>
