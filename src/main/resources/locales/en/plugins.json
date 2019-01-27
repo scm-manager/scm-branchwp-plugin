@@ -23,6 +23,6 @@
     "add-user-permission": "Add User Permission ",
     "add-group-permission": "Add Group Permission ",
     "is-enabled": "Enable Branch Write Permissions",
-    "is-enabled-help-text": "Enable or Disable the ability to give Branch Write Permissions"
+    "is-enabled-help-text": "if enabled, only users or groups with explicitly given write permission are permitted to push to the given branches"
   }
 }
