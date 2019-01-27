@@ -51,7 +51,7 @@ public class RepositoryLinkEnricherTest {
 
   @Test
   @SubjectAware(username = "admin", password = "secret")
-  public void shouldEnrichIndex() {
+  public void shouldEnrichRepository() {
     enricher = new RepositoryLinkEnricher(scmPathInfoStoreProvider);
     Repository repo = new Repository("id", "type", "space", "name");
     LinkEnricherContext context = LinkEnricherContext.of(repo);
@@ -60,7 +60,7 @@ public class RepositoryLinkEnricherTest {
   }
 
   @Test
-  public void shouldNotEnrichIndexBecauseOfMissingPermission() {
+  public void shouldNotEnrichRepositoryBecauseOfMissingPermission() {
     enricher = new RepositoryLinkEnricher(scmPathInfoStoreProvider);
     Repository repo = new Repository("id", "type", "space", "name");
     LinkEnricherContext context = LinkEnricherContext.of(repo);
