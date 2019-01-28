@@ -49,6 +49,11 @@ public class RepositoryHook {
       log.warn("there is no context in the received repository hook");
       return;
     }
+    if (!context.isFeatureSupported(HookFeature.BRANCH_PROVIDER)) {
+      log.info("The repository does not support branches. Skip BranchWP plugin.");
+      return;
+    }
+
     Repository repository = event.getRepository();
     if (repository == null) {
       log.warn("there is no repository in the received repository hook");
