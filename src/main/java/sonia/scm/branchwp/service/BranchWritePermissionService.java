@@ -56,8 +56,7 @@ public class BranchWritePermissionService {
       return true;
     }
 
-    ConfigurationStore<BranchWritePermissions> store = getStore(repository);
-    BranchWritePermissions permissions = store.get();
+    BranchWritePermissions permissions = getPermissions(repository);
     if (!permissions.isEnabled()) {
       return true;
     }
@@ -114,12 +113,20 @@ public class BranchWritePermissionService {
     }
     return repository;
   }
-
   public BranchWritePermissions getPermissions(String namespace, String name) {
     Repository repository = getRepository(namespace, name);
     checkPermission(repository);
+    return getPermissions(repository);
+  }
+
+  private BranchWritePermissions getPermissions(Repository repository) {
     ConfigurationStore<BranchWritePermissions> store = getStore(repository);
-    return store.get();
+    BranchWritePermissions permissions = store.get();
+    if (permissions == null) {
+      permissions = new BranchWritePermissions();
+      store.set(permissions);
+    }
+    return permissions;
   }
 
   public void setPermissions(String namespace, String name, BranchWritePermissions permissions) {
