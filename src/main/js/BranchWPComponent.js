@@ -1,15 +1,22 @@
 //@flow
 import React from "react";
-import {connect} from "react-redux";
-import {confirmAlert, DropDown, LabelWithHelpIcon, InputField, Autocomplete} from "@scm-manager/ui-components";
-import {translate} from "react-i18next";
-import type {BranchWP} from "./BranchWP";
+import { connect } from "react-redux";
+import {
+  confirmAlert,
+  DropDown,
+  LabelWithHelpIcon,
+  InputField,
+  Autocomplete
+} from "@scm-manager/ui-components";
+import type { SelectValue, Link } from "@scm-manager/ui-types"
+import { translate } from "react-i18next";
+import type { BranchWP } from "./BranchWP";
 
 type Props = {
   branchWP: BranchWP,
   readOnly: boolean,
-  onChange: (BranchWP) => void,
-  onDelete: (BranchWP) => void,
+  onChange: BranchWP => void,
+  onDelete: BranchWP => void,
   userAutocompleteLink: string,
   groupAutocompleteLink: string,
   // context prop
@@ -33,19 +40,21 @@ class BranchWPComponent extends React.Component<Props, State> {
   }
 
   handleChange = (value: any, name: string) => {
-    this.setState({
-      [name]: value
-    }, () => this.props.onChange(this.state));
+    this.setState(
+      {
+        [name]: value
+      },
+      () => this.props.onChange(this.state)
+    );
   };
 
-
   handleDropDownChange = (selection: string) => {
-    this.setState({...this.state, type: selection});
+    this.setState({ ...this.state, type: selection });
     this.handleChange(selection, "type");
   };
 
   confirmDelete = () => {
-    const {t} = this.props;
+    const { t } = this.props;
     confirmAlert({
       title: t("scm-branchwp-plugin.confirm-delete.title"),
       message: t("scm-branchwp-plugin.confirm-delete.message"),
@@ -62,10 +71,14 @@ class BranchWPComponent extends React.Component<Props, State> {
     });
   };
 
-
   loadSuggestions = (inputValue: string) => {
-    const {group} = this.state;
-    return this.loadAutocompletion(group? this.props.groupAutocompleteLink:this.props.userAutocompleteLink, inputValue);
+    const { group } = this.state;
+    return this.loadAutocompletion(
+      group
+        ? this.props.groupAutocompleteLink
+        : this.props.userAutocompleteLink,
+      inputValue
+    );
   };
 
   loadAutocompletion(url: string, inputValue: string) {
@@ -83,66 +96,77 @@ class BranchWPComponent extends React.Component<Props, State> {
           };
         });
       });
-  };
+  }
 
   selectName = (value: SelectValue) => {
     let name = value.value.id;
-    this.setState({
-      name
-    }, () => this.props.onChange(this.state));
+    this.setState(
+      {
+        name
+      },
+      () => this.props.onChange(this.state)
+    );
   };
 
   render() {
-    const {t, readOnly} = this.props;
-    const {branch, name, group, type} = this.state;
-    const deleteIcon = readOnly ? "" :
-      <a className="level-item"
-         onClick={this.confirmDelete}
-      >
+    const { t, readOnly } = this.props;
+    const { branch, name, group, type } = this.state;
+    const deleteIcon = readOnly ? (
+      ""
+    ) : (
+      <a className="level-item" onClick={this.confirmDelete}>
         <span className="icon is-small">
-          <i className="fas fa-trash">
-          </i>
+          <i className="fas fa-trash" />
         </span>
       </a>
-    ;
-
+    );
     return (
       <article className="media">
         <div className="media-content">
           <LabelWithHelpIcon
-            label={group? t("scm-branchwp-plugin.form.group") : t("scm-branchwp-plugin.form.user")}
+            label={
+              group
+                ? t("scm-branchwp-plugin.form.group")
+                : t("scm-branchwp-plugin.form.user")
+            }
             helpText={t("scm-branchwp-plugin.form.permission-help-text")}
           />
-            <DropDown
-              options={["ALLOW", "DENY"]}
-              optionSelected={this.handleDropDownChange}
-              preselectedOption={this.state.type}
-              disabled={readOnly}
-            />
+          <DropDown
+            options={["ALLOW", "DENY"]}
+            optionSelected={this.handleDropDownChange}
+            preselectedOption={this.state.type}
+            disabled={readOnly}
+          />
           <Autocomplete
-            label={group? t("scm-branchwp-plugin.form.group-name"): t("scm-branchwp-plugin.form.user-name")}
+            label={
+              group
+                ? t("scm-branchwp-plugin.form.group-name")
+                : t("scm-branchwp-plugin.form.user-name")
+            }
             loadSuggestions={this.loadSuggestions}
-            helpText={group? t("scm-branchwp-plugin.form.group-name-help-text" ): t("scm-branchwp-plugin.form.user-name-help-text")}
+            helpText={
+              group
+                ? t("scm-branchwp-plugin.form.group-name-help-text")
+                : t("scm-branchwp-plugin.form.user-name-help-text")
+            }
             valueSelected={this.selectName}
             value={name}
             placeholder={name}
           />
-            <InputField
-              name={"branch"}
-              placeholder={t("scm-branchwp-plugin.form.branch")}
-              label={t("scm-branchwp-plugin.form.branch")}
-              helpText={t("scm-branchwp-plugin.form.branch-help-text")}
-              value={branch}
-              onChange={this.handleChange}
-              disabled={readOnly}
-            />
+          <InputField
+            name={"branch"}
+            placeholder={t("scm-branchwp-plugin.form.branch")}
+            label={t("scm-branchwp-plugin.form.branch")}
+            helpText={t("scm-branchwp-plugin.form.branch-help-text")}
+            value={branch}
+            onChange={this.handleChange}
+            disabled={readOnly}
+          />
         </div>
-        <div className="media-right">
-          {deleteIcon}
-        </div>
+        <div className="media-right">{deleteIcon}</div>
       </article>
     );
-  };
+  }
 }
 
 function getUserAutoCompleteLink(state: Object): string {
@@ -171,7 +195,7 @@ function getLinkCollection(state: Object, name: string): Link[] {
   return [];
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const userAutocompleteLink = getUserAutoCompleteLink(state);
   const groupAutocompleteLink = getGroupAutoCompleteLink(state);
   return {
@@ -180,4 +204,6 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(translate("plugins")(BranchWPComponent));
+export default connect(mapStateToProps)(
+  translate("plugins")(BranchWPComponent)
+);
