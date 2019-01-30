@@ -11,7 +11,7 @@ type Props = {
   t: string => string
 };
 
-class BranchWPsContainer extends React.Component<Props, State> {
+class BranchWPsContainer extends React.Component<Props> {
 
   constructor(props: Props) {
     super(props);
