@@ -11,7 +11,8 @@
       "user-name-help-text": "Select the user to be privileged for the branch",
       "branch": "Branch",
       "branch-help-text": "Enter a branch name or a pattern like feature/* {mail}/* {username}/feature* {mail} and {username} would be replaced with the user mail and username ",
-      "permission-help-message": "Select Permission"
+      "permission-help-message": "Select Permission",
+      "add": "Add"
     },
     "confirm-delete": {
       "title": "Delete Branch Permission",

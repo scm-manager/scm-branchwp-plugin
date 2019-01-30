@@ -8,7 +8,7 @@ import {
   InputField,
   Autocomplete
 } from "@scm-manager/ui-components";
-import type { SelectValue, Link } from "@scm-manager/ui-types"
+import type { SelectValue, Link } from "@scm-manager/ui-types";
 import { translate } from "react-i18next";
 import type { BranchWP } from "./BranchWP";
 
@@ -73,7 +73,7 @@ class BranchWPComponent extends React.Component<Props, State> {
 
   loadSuggestions = (inputValue: string) => {
     const { group } = this.state;
-    return this.loadAutocompletion(
+    return loadAutocompletion(
       group
         ? this.props.groupAutocompleteLink
         : this.props.userAutocompleteLink,
@@ -81,22 +81,6 @@ class BranchWPComponent extends React.Component<Props, State> {
     );
   };
 
-  loadAutocompletion(url: string, inputValue: string) {
-    const link = url + "?q=";
-    return fetch(link + inputValue)
-      .then(response => response.json())
-      .then(json => {
-        return json.map(element => {
-          const label = element.displayName
-            ? `${element.displayName} (${element.id})`
-            : element.id;
-          return {
-            value: element,
-            label
-          };
-        });
-      });
-  }
 
   selectName = (value: SelectValue) => {
     let name = value.value.id;
@@ -110,7 +94,7 @@ class BranchWPComponent extends React.Component<Props, State> {
 
   render() {
     const { t, readOnly } = this.props;
-    const { branch, name, group, type } = this.state;
+    const { branch, name, group } = this.state;
     const deleteIcon = readOnly ? (
       ""
     ) : (
@@ -203,6 +187,24 @@ const mapStateToProps = state => {
     groupAutocompleteLink
   };
 };
+
+const loadAutocompletion = (url: string, inputValue: string) => {
+  const link = url + "?q=";
+  return fetch(link + inputValue)
+    .then(response => response.json())
+    .then(json => {
+      return json.map(element => {
+        const label = element.displayName
+          ? `${element.displayName} (${element.id})`
+          : element.id;
+        return {
+          value: element,
+          label
+        };
+      });
+    });
+}
+
 
 export default connect(mapStateToProps)(
   translate("plugins")(BranchWPComponent)

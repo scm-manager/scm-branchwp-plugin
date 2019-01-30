@@ -1,14 +1,17 @@
 //@flow
 import React from "react";
 import { translate } from "react-i18next";
-import type { BranchWPs } from "./BranchWP";
-import { Button, Checkbox } from "@scm-manager/ui-components";
-import BranchWPComponent from "./BranchWPComponent";
+import type { BranchWPs, BranchWP } from "./BranchWP";
+import { Checkbox } from "@scm-manager/ui-components";
+import BranchWPTable from "./BranchWPTable";
+import AddUserFormComponent from "./AddUserFormComponent";
 
 type Props = {
   initialConfiguration: BranchWPs,
   readOnly: boolean,
   onConfigurationChange: (BranchWPs, boolean) => void,
+  userAutocompleteLink: string,
+  groupAutocompleteLink: string,
   // context prop
   t: string => string
 };
@@ -53,59 +56,40 @@ class BranchWPsForm extends React.Component<Props, State> {
     this.updateBranchWPs(permissions);
   };
 
-  onChangeEnabled = isEnabled => {
-    this.setState({ enabled: isEnabled }, () =>
-      this.props.onConfigurationChange(this.state, this.isValid())
+  userBranchPermissionAdded = (permission: BranchWP) => {
+    this.setState(
+      {
+        ...this.state,
+        permissions: [...this.state.permissions, permission]
+      },
+      () => {
+        this.props.onConfigurationChange(this.state, this.isValid());
+      }
     );
   };
 
-  render() {
-    const { permissions, enabled } = this.state;
-    const { t, readOnly } = this.props;
-    let defaultUserBranchWP = {
-      branch: "",
-      name: "",
-      group: false,
-      type: "ALLOW"
-    };
-    let defaultGroupBranchWP = {
-      branch: "",
-      name: "",
-      group: true,
-      type: "ALLOW"
-    };
+  onChangeEnabled = isEnabled => {
+    this.setState({ enabled: isEnabled }, () => {
+      this.props.onConfigurationChange(this.state, this.isValid());
+    });
+  };
 
-    const buttons = (
-      <article className="media">
-        <Button
-          disabled={readOnly}
-          label={t("scm-branchwp-plugin.add-user-permission")}
-          action={() => {
-            permissions.push(defaultUserBranchWP);
-            this.updateBranchWPs(permissions);
-          }}
-        />
-        <Button
-          disabled={readOnly}
-          label={t("scm-branchwp-plugin.add-group-permission")}
-          action={() => {
-            permissions.push(defaultGroupBranchWP);
-            this.updateBranchWPs(permissions);
-          }}
-        />
-      </article>
-    );
-
-    const form = permissions.map((branchWP, index) => {
+  renderAddUserFormComponent = () => {
+    const { readOnly } = this.props;
+    if (this.props.userAutocompleteLink) {
       return (
-        <BranchWPComponent
-          branchWP={branchWP}
+        <AddUserFormComponent
+          userAutocompleteLink={this.props.userAutocompleteLink}
+          onAdd={this.userBranchPermissionAdded}
           readOnly={readOnly}
-          onDelete={this.onDelete}
-          onChange={changedBranchWP => this.onChange(changedBranchWP, index)}
         />
       );
-    });
+    } else return null;
+  };
+
+  render() {
+    const { enabled } = this.state;
+    const { t } = this.props;
 
     return (
       <>
@@ -115,8 +99,15 @@ class BranchWPsForm extends React.Component<Props, State> {
           label={t("scm-branchwp-plugin.is-enabled")}
           helpText={t("scm-branchwp-plugin.is-enabled-help-text")}
         />
-        {enabled ? form : ""}
-        {enabled ? buttons : ""}
+        {enabled ? (
+          <>
+            <BranchWPTable
+              permissions={this.state.permissions}
+              onDelete={this.onDelete}
+            />
+            {this.renderAddUserFormComponent()}
+          </>
+        ) : null}
       </>
     );
   }
