@@ -86,7 +86,7 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
       ...this.state,
       branchProtectionPermission: {
         ...this.state.branchProtectionPermission,
-        name: selection.label
+        name: selection.value.id
       },
       selectedValue: selection
     });
