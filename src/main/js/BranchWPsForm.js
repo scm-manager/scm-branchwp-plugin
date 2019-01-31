@@ -4,7 +4,7 @@ import { translate } from "react-i18next";
 import type { BranchWPs, BranchWP } from "./BranchWP";
 import { Checkbox } from "@scm-manager/ui-components";
 import BranchWPTable from "./BranchWPTable";
-import AddUserFormComponent from "./AddUserFormComponent";
+import AddPermissionFormComponent from "./AddPermissionFormComponent";
 
 type Props = {
   initialConfiguration: BranchWPs,
@@ -78,8 +78,9 @@ class BranchWPsForm extends React.Component<Props, State> {
     const { readOnly } = this.props;
     if (this.props.userAutocompleteLink) {
       return (
-        <AddUserFormComponent
+        <AddPermissionFormComponent
           userAutocompleteLink={this.props.userAutocompleteLink}
+          groupAutocompleteLink={this.props.groupAutocompleteLink}
           onAdd={this.userBranchPermissionAdded}
           readOnly={readOnly}
         />
