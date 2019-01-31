@@ -18,13 +18,22 @@ type Props = {
   // Context props
   t: string => string
 };
-type State = BranchWP;
+type State = {
+  branchProtectionPermission: BranchWP,
+  selectedValue: SelectValue
+};
 
 const defaultState = {
-  name: "",
-  type: "ALLOW",
-  branch: "",
-  group: false
+  branchProtectionPermission: {
+    name: "",
+    type: "ALLOW",
+    branch: "",
+    group: false
+  },
+  selectedValue: {
+    label: "",
+    value: { id: "", displayName: "" }
+  }
 };
 
 class AddUserFormComponent extends React.Component<Props, State> {
@@ -54,20 +63,42 @@ class AddUserFormComponent extends React.Component<Props, State> {
   };
 
   handleDropDownChange = (type: string) => {
-    this.setState({ ...this.state, type });
+    this.setState({
+      ...this.state,
+      branchProtectionPermission: {
+        ...this.state.branchProtectionPermission,
+        type
+      }
+    });
   };
 
   selectName = (selection: SelectValue) => {
-    this.setState({ ...this.state, name: selection.label });
+    this.setState(
+      {
+        ...this.state,
+        branchProtectionPermission: {
+          ...this.state.branchProtectionPermission,
+          name: selection.label
+        },
+        selectedValue: selection
+      }
+    );
   };
 
   handleBranchExpressionChange = (branch: string) => {
-    this.setState({ ...this.state, branch });
+    this.setState({
+      ...this.state,
+      branchProtectionPermission: {
+        ...this.state.branchProtectionPermission,
+        branch
+      }
+    });
   };
 
   render() {
     const { t, readOnly } = this.props;
-    const { name, branch } = this.state;
+    const { branchProtectionPermission } = this.state;
+    const { branch } = branchProtectionPermission;
     return (
       <>
         <LabelWithHelpIcon
@@ -85,7 +116,7 @@ class AddUserFormComponent extends React.Component<Props, State> {
           loadSuggestions={this.loadSuggestions}
           helpText={t("scm-branchwp-plugin.form.user-name-help-text")}
           valueSelected={this.selectName}
-          value={name}
+          value={this.state.selectedValue}
           placeholder={t("scm-branchwp-plugin.form.user-name")}
         />
         <InputField
@@ -101,7 +132,7 @@ class AddUserFormComponent extends React.Component<Props, State> {
           label={t("scm-branchwp-plugin.form.add")}
           disabled={this.props.readOnly}
           action={() => {
-            this.props.onAdd(this.state);
+            this.props.onAdd(this.state.branchProtectionPermission);
             this.setState({ ...defaultState });
           }}
         />
