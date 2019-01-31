@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010, Sebastian Sdorra All rights reserved.
+ * Copyright (c) 2014, Sebastian Sdorra All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,26 +31,28 @@
 
 package sonia.scm.branchwp;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import com.google.inject.AbstractModule;
+import org.mapstruct.factory.Mappers;
+import sonia.scm.branchwp.api.BranchWritePermissionMapper;
+import sonia.scm.plugin.Extension;
+
 /**
  *
  * @author Sebastian Sdorra
  */
-public class BranchWPException extends RuntimeException
+@Extension
+public class BranchWritePermissionModule extends AbstractModule
 {
 
-  /** Field description */
-  private static final long serialVersionUID = -7098053137674255203L;
-
-  //~--- constructors ---------------------------------------------------------
-
   /**
-   * Constructs ...
+   * Method description
    *
-   *
-   * @param message
    */
-  public BranchWPException(String message)
+  @Override
+  protected void configure()
   {
-    super(message);
+    bind(BranchWritePermissionMapper.class).to(Mappers.getMapper(BranchWritePermissionMapper.class).getClass());
   }
 }
