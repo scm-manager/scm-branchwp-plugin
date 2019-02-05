@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import sonia.scm.api.v2.resources.LinkAppender;
-import sonia.scm.api.v2.resources.LinkEnricherContext;
+import sonia.scm.api.v2.resources.HalAppender;
+import sonia.scm.api.v2.resources.HalEnricherContext;
 import sonia.scm.api.v2.resources.ScmPathInfoStore;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.api.Command;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SubjectAware(configuration = "classpath:sonia/scm/branchwp/shiro-001.ini", username = "user_1", password = "secret")
-public class RepositoryLinkEnricherTest {
+public class RepositoryHalEnricherTest {
 
   private Provider<ScmPathInfoStore> scmPathInfoStoreProvider;
 
@@ -42,10 +42,10 @@ public class RepositoryLinkEnricherTest {
   private RepositoryService service;
 
   @Mock
-  private LinkAppender appender;
-  private RepositoryLinkEnricher enricher;
+  private HalAppender appender;
+  private RepositoryHalEnricher enricher;
 
-  public RepositoryLinkEnricherTest() {
+  public RepositoryHalEnricherTest() {
     // cleanup state that might have been left by other tests
     ThreadContext.unbindSecurityManager();
     ThreadContext.unbindSubject();
@@ -62,33 +62,33 @@ public class RepositoryLinkEnricherTest {
   @Test
   @SubjectAware(username = "admin", password = "secret")
   public void shouldEnrichRepository() {
-    enricher = new RepositoryLinkEnricher(scmPathInfoStoreProvider, serviceFactory);
+    enricher = new RepositoryHalEnricher(scmPathInfoStoreProvider, serviceFactory);
     Repository repo = new Repository("id", "type", "space", "name");
     when(serviceFactory.create(repo)).thenReturn(service);
     when(service.isSupported(Command.BRANCHES)).thenReturn(true);
-    LinkEnricherContext context = LinkEnricherContext.of(repo);
+    HalEnricherContext context = HalEnricherContext.of(repo);
     enricher.enrich(context, appender);
-    verify(appender).appendOne("branchWpConfig", "https://scm-manager.org/scm/api/v2/plugins/branchwp/space/name");
+    verify(appender).appendLink("branchWpConfig", "https://scm-manager.org/scm/api/v2/plugins/branchwp/space/name");
   }
 
   @Test
   public void shouldNotEnrichRepositoryBecauseOfMissingPermission() {
-    enricher = new RepositoryLinkEnricher(scmPathInfoStoreProvider, serviceFactory);
+    enricher = new RepositoryHalEnricher(scmPathInfoStoreProvider, serviceFactory);
     Repository repo = new Repository("id", "type", "space", "name");
-    LinkEnricherContext context = LinkEnricherContext.of(repo);
+    HalEnricherContext context = HalEnricherContext.of(repo);
     enricher.enrich(context, appender);
-    verify(appender, never()).appendOne(any(), any());
+    verify(appender, never()).appendLink(any(), any());
   }
 
   @Test
   public void shouldNotEnrichRepositoryBecauseBranchIsNotSupported() {
-    enricher = new RepositoryLinkEnricher(scmPathInfoStoreProvider, serviceFactory);
+    enricher = new RepositoryHalEnricher(scmPathInfoStoreProvider, serviceFactory);
     Repository repo = new Repository("id", "type", "space", "name");
     when(serviceFactory.create(repo)).thenReturn(service);
     when(service.isSupported(Command.BRANCHES)).thenReturn(false);
 
-    LinkEnricherContext context = LinkEnricherContext.of(repo);
+    HalEnricherContext context = HalEnricherContext.of(repo);
     enricher.enrich(context, appender);
-    verify(appender, never()).appendOne(any(), any());
+    verify(appender, never()).appendLink(any(), any());
   }
 }

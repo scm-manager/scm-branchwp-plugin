@@ -1,10 +1,10 @@
 package sonia.scm.branchwp;
 
 import sonia.scm.api.v2.resources.Enrich;
-import sonia.scm.api.v2.resources.LinkAppender;
+import sonia.scm.api.v2.resources.HalAppender;
 import sonia.scm.api.v2.resources.LinkBuilder;
-import sonia.scm.api.v2.resources.LinkEnricher;
-import sonia.scm.api.v2.resources.LinkEnricherContext;
+import sonia.scm.api.v2.resources.HalEnricher;
+import sonia.scm.api.v2.resources.HalEnricherContext;
 import sonia.scm.api.v2.resources.ScmPathInfoStore;
 import sonia.scm.branchwp.api.BranchWritePermissionResource;
 import sonia.scm.branchwp.service.BranchWritePermissionService;
@@ -19,24 +19,24 @@ import javax.inject.Provider;
 
 @Extension
 @Enrich(Repository.class)
-public class RepositoryLinkEnricher implements LinkEnricher {
+public class RepositoryHalEnricher implements HalEnricher {
 
   private final Provider<ScmPathInfoStore> scmPathInfoStoreProvider;
   private RepositoryServiceFactory serviceFactory;
 
   @Inject
-  public RepositoryLinkEnricher(Provider<ScmPathInfoStore> scmPathInfoStoreProvider, RepositoryServiceFactory serviceFactory) {
+  public RepositoryHalEnricher(Provider<ScmPathInfoStore> scmPathInfoStoreProvider, RepositoryServiceFactory serviceFactory) {
     this.scmPathInfoStoreProvider = scmPathInfoStoreProvider;
     this.serviceFactory = serviceFactory;
   }
 
   @Override
-  public void enrich(LinkEnricherContext context, LinkAppender appender) {
+  public void enrich(HalEnricherContext context, HalAppender appender) {
     Repository repository = context.oneRequireByType(Repository.class);
     try (RepositoryService repositoryService = serviceFactory.create(repository)) {
       if (BranchWritePermissionService.isPermitted(repository) && repositoryService.isSupported(Command.BRANCHES)) {
         LinkBuilder linkBuilder = new LinkBuilder(scmPathInfoStoreProvider.get().get(), BranchWritePermissionResource.class);
-        appender.appendOne("branchWpConfig", linkBuilder.method("get").parameters(repository.getNamespace(), repository.getName()).href());
+        appender.appendLink("branchWpConfig", linkBuilder.method("get").parameters(repository.getNamespace(), repository.getName()).href());
       }
     }
   }
