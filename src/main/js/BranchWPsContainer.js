@@ -1,6 +1,6 @@
 // @flow
 import React from "react";
-import { Configuration, Title } from "@scm-manager/ui-components";
+import { Configuration, Subtitle } from "@scm-manager/ui-components";
 import { translate } from "react-i18next";
 import type { Repository } from "@scm-manager/ui-types";
 import BranchWPsForm from "./BranchWPsForm";
@@ -27,7 +27,7 @@ class BranchWPsContainer extends React.Component<Props> {
     ).href;
     return (
       <>
-        <Title title={t("scm-branchwp-plugin.form.header")} />
+        <Subtitle subtitle={t("scm-branchwp-plugin.form.title")} />
         <br />
         <Configuration
           link={link}
