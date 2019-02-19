@@ -15,6 +15,7 @@ import sonia.scm.branchwp.service.BranchWritePermissions;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,7 +61,7 @@ public class BranchWritePermissionResourceTest {
   }
 
   @Test
-  public void shouldGetBranchWritePermissions() throws URISyntaxException {
+  public void shouldGetBranchWritePermissions() throws URISyntaxException, UnsupportedEncodingException {
     BranchWritePermissions permissions = new BranchWritePermissions();
     permissions.getPermissions().add(new BranchWritePermission("branch", "user_1", false, BranchWritePermission.Type.ALLOW));
     when(service.getPermissions("space", "repo")).thenReturn(permissions);

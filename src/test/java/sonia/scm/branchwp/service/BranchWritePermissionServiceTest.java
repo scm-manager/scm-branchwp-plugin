@@ -88,7 +88,7 @@ public class BranchWritePermissionServiceTest {
     BranchWritePermission permission = createBranchWritePermission();
     permissions.getPermissions().add(permission);
 
-    assertThatThrownBy(() -> service.setPermissions(REPOSITORY, permissions)).hasMessage("Subject does not have permission [repository:modify:id-1]");
+    assertThatThrownBy(() -> service.setPermissions(REPOSITORY, permissions)).hasMessage("Subject does not have permission [repository:branchwp:id-1]");
 
     verify(store, never()).set(any());
   }

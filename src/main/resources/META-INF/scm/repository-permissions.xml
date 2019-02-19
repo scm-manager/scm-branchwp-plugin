@@ -1,0 +1,5 @@
+<repository-permissions>
+  <verbs>
+    <verb>branchwp</verb>
+  </verbs>
+</repository-permissions>
