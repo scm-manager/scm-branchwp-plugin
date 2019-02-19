@@ -4,9 +4,8 @@ import com.google.common.base.Strings;
 import sonia.scm.group.GroupNames;
 import sonia.scm.repository.NamespaceAndName;
 import sonia.scm.repository.Repository;
+import sonia.scm.repository.RepositoryManager;
 import sonia.scm.repository.RepositoryPermissions;
-import sonia.scm.repository.api.RepositoryService;
-import sonia.scm.repository.api.RepositoryServiceFactory;
 import sonia.scm.store.ConfigurationStore;
 import sonia.scm.store.ConfigurationStoreFactory;
 import sonia.scm.user.User;
@@ -27,13 +26,13 @@ public class BranchWritePermissionService {
   public static final String VAR_USERNAME = "\\{username\\}";
 
   private ConfigurationStoreFactory storeFactory;
-  private RepositoryServiceFactory repositoryServiceFactory;
+  private RepositoryManager repositoryManager;
   private static final String STORE_NAME = "branchWritePermission";
 
   @Inject
-  public BranchWritePermissionService(ConfigurationStoreFactory storeFactory, RepositoryServiceFactory repositoryServiceFactory) {
+  public BranchWritePermissionService(ConfigurationStoreFactory storeFactory, RepositoryManager repositoryManager) {
     this.storeFactory = storeFactory;
-    this.repositoryServiceFactory = repositoryServiceFactory;
+    this.repositoryManager = repositoryManager;
   }
 
   /**
@@ -57,7 +56,7 @@ public class BranchWritePermissionService {
     }
 
     BranchWritePermissions permissions = getPermissions(repository);
-    if (!permissions.isEnabled()) {
+    if (!isPluginEnabled(permissions)) {
       return true;
     }
 
@@ -71,6 +70,15 @@ public class BranchWritePermissionService {
 
   public static boolean isPermitted(Repository repository) {
     return RepositoryPermissions.modify(repository).isPermitted();
+  }
+
+  private boolean isPluginEnabled(BranchWritePermissions permissions){
+    return permissions.isEnabled();
+  }
+
+  public boolean isPluginEnabled(Repository repository){
+    BranchWritePermissions permissions = getPermissions(repository);
+    return isPluginEnabled(permissions);
   }
 
   public void checkPermission(Repository repository) {
@@ -105,14 +113,10 @@ public class BranchWritePermissionService {
   private ConfigurationStore<BranchWritePermissions> getStore(Repository repository) {
     return storeFactory.withType(BranchWritePermissions.class).withName(STORE_NAME).forRepository(repository).build();
   }
-
   private Repository getRepository(String namespace, String name) {
-    Repository repository;
-    try (RepositoryService repositoryService = repositoryServiceFactory.create(new NamespaceAndName(namespace, name))) {
-      repository = repositoryService.getRepository();
-    }
-    return repository;
+    return repositoryManager.get(new NamespaceAndName(namespace, name));
   }
+
   public BranchWritePermissions getPermissions(String namespace, String name) {
     Repository repository = getRepository(namespace, name);
     checkPermission(repository);

@@ -60,6 +60,16 @@ public class RepositoryHook {
       return;
     }
 
+    if (!service.isPluginEnabled(repository)){
+      log.trace("branchwp plugin is disabled.");
+      return;
+    }
+
+    if (BranchWritePermissionService.isPermitted(repository)){
+      log.debug("skip branchwp check for {}, because the user has modify privileges to the repository", repository.getNamespaceAndName());
+      return;
+    }
+
     log.trace("received hook for repository {}", repository.getName());
     List<String> branches = getBranches(context, repository);
     for (String branch : branches) {
