@@ -2,7 +2,7 @@
 import React from "react";
 import { translate } from "react-i18next";
 import type { BranchWPs, BranchWP } from "./BranchWP";
-import { Checkbox } from "@scm-manager/ui-components";
+import { Checkbox, Subtitle } from "@scm-manager/ui-components";
 import BranchWPTable from "./BranchWPTable";
 import AddPermissionFormComponent from "./AddPermissionFormComponent";
 
@@ -102,6 +102,8 @@ class BranchWPsForm extends React.Component<Props, State> {
         />
         {enabled ? (
           <>
+            <hr />
+            <Subtitle subtitle={t("scm-branchwp-plugin.form.title")} />
             <BranchWPTable
               permissions={this.state.permissions}
               onDelete={this.onDelete}
