@@ -5,7 +5,8 @@ import {
   Button,
   InputField,
   Radio,
-  DropDown
+  DropDown,
+  Subtitle
 } from "@scm-manager/ui-components";
 import { translate } from "react-i18next";
 import type { BranchWP } from "./BranchWP";
@@ -120,39 +121,44 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
     const { branch } = branchProtectionPermission;
     return (
       <>
-        <h1 class="subtitle">{t("scm-branchwp-plugin.form.add-permission")}</h1>
+        <hr />
+        <Subtitle subtitle={t("scm-branchwp-plugin.form.add-permission")} />
         <LabelWithHelpIcon
           label={t("scm-branchwp-plugin.form.permission-type")}
           helpText={t("scm-branchwp-plugin.form.permission-type-help-text")}
         />
-        <div className="field is-grouped">
-          <div className="control">
-            <Radio
-              label={t("scm-branchwp-plugin.form.user-permission")}
-              name="permission_scope"
-              value="USER_PERMISSION"
-              checked={!this.state.branchProtectionPermission.group}
-              onChange={this.permissionScopeChanged}
-            />
-            <Radio
-              label={t("scm-branchwp-plugin.form.group-permission")}
-              name="permission_scope"
-              value="GROUP_PERMISSION"
-              checked={this.state.branchProtectionPermission.group}
-              onChange={this.permissionScopeChanged}
+        <div className="columns is-multiline">
+          <div className="column is-full">
+            <div className="field is-grouped">
+              <div className="control">
+                <Radio
+                  label={t("scm-branchwp-plugin.form.user-permission")}
+                  name="permission_scope"
+                  value="USER_PERMISSION"
+                  checked={!this.state.branchProtectionPermission.group}
+                  onChange={this.permissionScopeChanged}
+                />
+                <Radio
+                  label={t("scm-branchwp-plugin.form.group-permission")}
+                  name="permission_scope"
+                  value="GROUP_PERMISSION"
+                  checked={this.state.branchProtectionPermission.group}
+                  onChange={this.permissionScopeChanged}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="column is-full">
+            <InputField
+              name={"branch"}
+              placeholder={t("scm-branchwp-plugin.form.branch")}
+              label={t("scm-branchwp-plugin.form.branch")}
+              helpText={t("scm-branchwp-plugin.form.branch-help-text")}
+              value={branch}
+              onChange={this.handleBranchExpressionChange}
+              disabled={readOnly}
             />
           </div>
-        </div>
-        <InputField
-          name={"branch"}
-          placeholder={t("scm-branchwp-plugin.form.branch")}
-          label={t("scm-branchwp-plugin.form.branch")}
-          helpText={t("scm-branchwp-plugin.form.branch-help-text")}
-          value={branch}
-          onChange={this.handleBranchExpressionChange}
-          disabled={readOnly}
-        />
-        <div class="columns">
           <div className="column is-three-fifths">
             {this.renderAutocomplete()}
           </div>
@@ -178,6 +184,7 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
                     this.props.onAdd(this.state.branchProtectionPermission);
                     this.setState({ ...defaultState });
                   }}
+                  className="label-icon-spacing"
                 />
               </div>
             </div>

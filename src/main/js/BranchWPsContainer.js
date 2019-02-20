@@ -28,7 +28,6 @@ class BranchWPsContainer extends React.Component<Props> {
     return (
       <>
         <Subtitle subtitle={t("scm-branchwp-plugin.form.title")} />
-        <br />
         <Configuration
           link={link}
           render={props => (
