@@ -31,5 +31,23 @@
     "add-group-permission": "Berechtigung für Gruppe hinzufügen ",
     "is-enabled": "Branch Write Berechtigungen aktivieren",
     "is-enabled-help-text": "Wenn diese Option aktiv ist, können nur Administratoren, Owner des Repositories und die spezifizierten Regeln auf dem Repository schreiben."
+  },
+  "permissions": {
+    "repository": {
+      "branchwp": {
+        "*": {
+          "displayName": "Repository-spezifische Schreibrechte für Branches ändern",
+          "description": "Darf die repository-spezifischen Schreibrechte für Branches verändern"
+        }
+      }
+    }
+  },
+  "verbs": {
+    "repository": {
+      "branchwp": {
+        "displayName": "Schreibrechte für Branches ändern",
+        "description": "Darf die Schreibrechte für Branches verändern"
+      }
+    }
   }
 }

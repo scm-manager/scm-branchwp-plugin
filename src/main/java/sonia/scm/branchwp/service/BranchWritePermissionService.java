@@ -24,6 +24,7 @@ public class BranchWritePermissionService {
 
   public static final String VAR_MAIL = "\\{mail\\}";
   public static final String VAR_USERNAME = "\\{username\\}";
+  public static final String CUSTOM_ACTION = "branchwp";
 
   private ConfigurationStoreFactory storeFactory;
   private RepositoryManager repositoryManager;
@@ -69,7 +70,7 @@ public class BranchWritePermissionService {
   }
 
   public static boolean isPermitted(Repository repository) {
-    return RepositoryPermissions.modify(repository).isPermitted();
+    return RepositoryPermissions.custom(CUSTOM_ACTION, repository).isPermitted();
   }
 
   private boolean isPluginEnabled(BranchWritePermissions permissions){
@@ -82,7 +83,7 @@ public class BranchWritePermissionService {
   }
 
   public void checkPermission(Repository repository) {
-    RepositoryPermissions.modify(repository).check();
+    RepositoryPermissions.custom(CUSTOM_ACTION, repository).check();
   }
 
   private boolean hasAnyGroupPermission(GroupNames userGroups, String branch, BranchWritePermissions permissions, BranchWritePermission.Type type, User user) {

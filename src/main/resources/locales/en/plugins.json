@@ -31,5 +31,23 @@
     "add-group-permission": "Add Group Permission ",
     "is-enabled": "Enable Branch Write Permissions",
     "is-enabled-help-text": "If enabled, nobody can write to the repository expect administrators, repository owners and the specified rules."
+  },
+  "permissions": {
+    "repository": {
+      "branchwp": {
+        "*": {
+          "displayName": "Modify repository specific branch permissions",
+          "description": "May modify repository specific branch permissions"
+        }
+      }
+    }
+  },
+  "verbs": {
+    "repository": {
+      "branchwp": {
+        "displayName": "modify branch permissions",
+        "description": "May modify branch permissions"
+      }
+    }
   }
 }
