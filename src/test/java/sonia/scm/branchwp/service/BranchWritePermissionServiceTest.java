@@ -140,8 +140,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldAllowAnyUserIfTheConfigIsDisabled() {
-    BranchWritePermissions permissions = createBranchWPs(true);
-    permissions.setEnabled(false);
+    BranchWritePermissions permissions = createBranchWPs(false);
     when(store.get()).thenReturn(permissions);
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
 
