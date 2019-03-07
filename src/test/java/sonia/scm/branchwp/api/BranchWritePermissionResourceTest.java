@@ -63,6 +63,7 @@ public class BranchWritePermissionResourceTest {
   @Test
   public void shouldGetBranchWritePermissions() throws URISyntaxException, UnsupportedEncodingException {
     BranchWritePermissions permissions = new BranchWritePermissions();
+    permissions.setEnabled(true);
     permissions.getPermissions().add(new BranchWritePermission("branch", "user_1", false, BranchWritePermission.Type.ALLOW));
     when(service.getPermissions("space", "repo")).thenReturn(permissions);
 
@@ -90,6 +91,7 @@ public class BranchWritePermissionResourceTest {
       .isEqualTo(HttpServletResponse.SC_NO_CONTENT);
     verify(service).setPermissions(eq("space"), eq("repo"), argThat(branchWritePermissions -> {
       BranchWritePermissions permissions = new BranchWritePermissions();
+      permissions.setEnabled(true);
       permissions.getPermissions().add(new BranchWritePermission("branch", "user_1", false, BranchWritePermission.Type.ALLOW));
       assertThat(branchWritePermissions).isEqualToComparingFieldByFieldRecursively(permissions);
       return true;

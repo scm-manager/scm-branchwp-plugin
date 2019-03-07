@@ -63,11 +63,10 @@ public class BranchWritePermissionServiceTest {
   }
 
 
-
   @Test
   @SubjectAware(username = "owner", password = "secret")
   public void shouldStorePermissionForOwner() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
 
     BranchWritePermission permission = createBranchWritePermission();
     permissions.getPermissions().add(permission);
@@ -83,7 +82,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldFailOnStoringPermissionForNotAdminOrOwnerUsers() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
 
     BranchWritePermission permission = createBranchWritePermission();
     permissions.getPermissions().add(permission);
@@ -95,7 +94,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldReplaceUserNameInBranch() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission = new BranchWritePermission("{username}/feature/*", USER.getName(), false, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(branchWritePermission);
     when(store.get()).thenReturn(permissions);
@@ -107,7 +106,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldReplaceMailInBranch() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission2 = new BranchWritePermission("{mail}/feature/*", USER.getName(), false, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(branchWritePermission2);
     when(store.get()).thenReturn(permissions);
@@ -141,7 +140,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldAllowAnyUserIfTheConfigIsDisabled() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     permissions.setEnabled(false);
     when(store.get()).thenReturn(permissions);
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
@@ -152,7 +151,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldPrivilegeUserBecauseTheBranchIsAllowedToTheUser() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     permissions.getPermissions().add(createBranchWritePermission());
     when(store.get()).thenReturn(permissions);
 
@@ -163,7 +162,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldPrivilegeUserBecauseAllBranchesAreAllowedToTheUser() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission = new BranchWritePermission("*", USER.getName(), false, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(branchWritePermission);
     when(store.get()).thenReturn(permissions);
@@ -175,7 +174,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldPrivilegeUserBecauseAllBranchesAreAllowedToOneOfHisGroups() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission = new BranchWritePermission("*", GROUP_NAME, true, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(branchWritePermission);
     when(store.get()).thenReturn(permissions);
@@ -187,7 +186,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldPrivilegeUserBecauseTheSearchedBranchIsAllowedToOneOfHisGroups() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission = new BranchWritePermission(BRANCH, GROUP_NAME, true, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(branchWritePermission);
     when(store.get()).thenReturn(permissions);
@@ -197,9 +196,15 @@ public class BranchWritePermissionServiceTest {
     assertThat(privileged).isTrue();
   }
 
+  private BranchWritePermissions createBranchWPs(boolean enabled) {
+    BranchWritePermissions permissions = new BranchWritePermissions();
+    permissions.setEnabled(enabled);
+    return permissions;
+  }
+
   @Test
   public void shouldDenyPermissionBecauseAllBranchesAreAllowedToTheUserButTheSearchedBranchIsDenied() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission = new BranchWritePermission("*", USER.getName(), false, BranchWritePermission.Type.ALLOW);
     BranchWritePermission deniedPermission = new BranchWritePermission(BRANCH, USER.getName(), false, BranchWritePermission.Type.DENY);
     permissions.getPermissions().add(branchWritePermission);
@@ -213,7 +218,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldDenyPermissionBecauseAllBranchesAreAllowedToOneOfTheUserGroupsButTheSearchedBranchIsDenied() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission = new BranchWritePermission("*", GROUP_NAME, true, BranchWritePermission.Type.ALLOW);
     BranchWritePermission deniedPermission = new BranchWritePermission(BRANCH, USER.getName(), false, BranchWritePermission.Type.DENY);
     permissions.getPermissions().add(branchWritePermission);
@@ -227,7 +232,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldDenyPermissionBecauseTheSearchedBranchIsDenied() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission deniedPermission = new BranchWritePermission(BRANCH, USER.getName(), false, BranchWritePermission.Type.DENY);
     permissions.getPermissions().add(deniedPermission);
     when(store.get()).thenReturn(permissions);
@@ -239,7 +244,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldDenyPermissionBecauseTheSearchedBranchIsDeniedToOneOfTheUserGroups() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission deniedPermission = new BranchWritePermission(BRANCH, GROUP_NAME, true, BranchWritePermission.Type.DENY);
     permissions.getPermissions().add(deniedPermission);
     when(store.get()).thenReturn(permissions);
@@ -251,7 +256,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   public void shouldDenyPermissionBecauseThereIsNoStoredPermissionForTheSearchedBranch() {
-    BranchWritePermissions permissions = new BranchWritePermissions();
+    BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission deniedPermission = new BranchWritePermission("other_branch", USER.getName(), false, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(deniedPermission);
     when(store.get()).thenReturn(permissions);
