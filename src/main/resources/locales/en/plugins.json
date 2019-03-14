@@ -1,10 +1,10 @@
 {
   "scm-branchwp-plugin": {
     "form": {
-      "title": "Edit write permission for branches",
+      "title": "Write permission for branches",
       "group": "Group Permission",
       "user": "User Permission",
-      "permission-help-text": "select the branch write permission",
+      "permission-help-text": "Select the branch write permission",
       "group-name": "Select Group",
       "user-name": "Select User",
       "group-name-help-text": "Select the group to be privileged for the branch",
