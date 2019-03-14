@@ -4,7 +4,7 @@
       "title": "Schreib-Berechtigungen für Branches",
       "group": "Berechtigung für Gruppe",
       "user": "Berechtigung für Benutzer",
-      "permission-help-text": "Auswahl der Branch Write Berechtigung.",
+      "permission-help-text": "Auswahl der Branch Schreib-Berechtigung.",
       "group-name": "Gruppe auswählen",
       "user-name": "Benutzer auswählen",
       "group-name-help-text": "Auswahl der Gruppe, die für den Branch berechtigt werden soll.",
@@ -29,7 +29,7 @@
     "nav-link": "Branch Berechtigungen",
     "add-user-permission": "Berechtigung für Benutzer hinzufügen ",
     "add-group-permission": "Berechtigung für Gruppe hinzufügen ",
-    "is-enabled": "Branch Write Berechtigungen aktivieren",
+    "is-enabled": "Schreib-Berechtigungen für Branches aktivieren",
     "is-enabled-help-text": "Wenn diese Option aktiv ist, können nur Administratoren, Owner des Repositories und die spezifizierten Regeln auf dem Repository schreiben."
   },
   "permissions": {
