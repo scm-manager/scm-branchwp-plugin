@@ -1,5 +1,12 @@
 {
   "scm-branchwp-plugin": {
+    "table" :{
+      "branch" : "Branch",
+      "name" : "Name",
+      "type" : "Typ",
+      "group" : "Gruppe",
+      "delete" : "Löschen"
+    },
     "form": {
       "title": "Schreib-Berechtigungen für Branches",
       "group": "Berechtigung für Gruppe",

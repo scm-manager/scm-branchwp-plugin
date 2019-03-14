@@ -1,5 +1,12 @@
 {
   "scm-branchwp-plugin": {
+    "table" :{
+      "branch" : "Branch",
+      "name" : "Name",
+      "type" : "Type",
+      "group" : "Group",
+      "delete" : "Delete"
+    },
     "form": {
       "title": "Write permission for branches",
       "group": "Group Permission",
