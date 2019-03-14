@@ -1,7 +1,7 @@
 {
   "scm-branchwp-plugin": {
     "form": {
-      "title": "Bearbeitung von write- Berechtigungen für Branches",
+      "title": "Schreib-Berechtigungen für Branches",
       "group": "Berechtigung für Gruppe",
       "user": "Berechtigung für Benutzer",
       "permission-help-text": "Auswahl der Branch Write Berechtigung.",
@@ -10,20 +10,20 @@
       "group-name-help-text": "Auswahl der Gruppe, die für den Branch berechtigt werden soll.",
       "user-name-help-text": "Auswahl des Benutzers, der für den Branch berechtigt werden soll.",
       "branch": "Branch",
-      "branch-help-text": "Eingabe eines Enter Branchnamens oder von Mustern. Diese Muster würden mit user, mail und username ersetzt werden: feature/* {mail}/* {username}/feature* {mail} und {username} ",
+      "branch-help-text": "Hier kann ein Branch-Name oder Muster angegeben werden. Diese Muster können mit user, mail und username ersetzt werden: feature/* {mail}/* {username}/feature* {mail} und {username} ",
       "permission-help-message": "Auswahl der Berechtigung.",
       "add": "Hinzufügen",
-      "group-permission": "Berechtigung für Gruppe",
-      "user-permission": "Berechtigung für Benutzer",
+      "group-permission": "Gruppe berechtigen",
+      "user-permission": "Benutzer berechtigen",
       "permission": "Berechtigung",
       "add-permission": "Berechtigung hinzufügen",
       "permission-type": "Art der Berechtigung",
-      "permission-type-help-text": "Spezifizierung der Art der Berechtigung."
+      "permission-type-help-text": "Festlegung der Art der Berechtigung."
     },
     "confirm-delete": {
-      "title": "Löschen der Branch- Berechtigung",
-      "message": "Soll die Branch- Berechtigung wirklich gelöscht werden?",
-      "submit": "Ja (nicht das Speichern vergessen)",
+      "title": "Löschen der Branch-Berechtigung",
+      "message": "Soll die Branch-Berechtigung wirklich gelöscht werden?",
+      "submit": "Ja (Speichern nicht vergessen)",
       "cancel": "Nein"
     },
     "nav-link": "Branch Berechtigungen",
