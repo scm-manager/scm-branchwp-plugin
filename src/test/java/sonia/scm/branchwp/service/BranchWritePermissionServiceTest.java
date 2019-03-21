@@ -120,7 +120,6 @@ public class BranchWritePermissionServiceTest {
   @SubjectAware(username = "owner", password = "secret")
   public void shouldAllowRepositoryOwnerWithoutReadingPermissions() {
     User admin = new User("owner");
-    admin.setAdmin(false);
     boolean privileged = service.isPrivileged(admin, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
 
     assertThat(privileged).isTrue();
@@ -131,7 +130,6 @@ public class BranchWritePermissionServiceTest {
   @SubjectAware(username = "admin", password = "secret")
   public void shouldAllowAdminWithoutReadingPermissions() {
     User admin = new User("admin");
-    admin.setAdmin(true);
     boolean privileged = service.isPrivileged(admin, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
 
     assertThat(privileged).isTrue();
