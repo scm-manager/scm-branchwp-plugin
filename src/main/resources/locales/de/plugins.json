@@ -5,6 +5,7 @@
     "enableHelpText": "Wenn diese Option aktiv ist, können nur Administratoren, Owner des Repositories und die spezifizierten Regeln auf dem Repository schreiben.",
     "editSubtitle": "Schreib-Berechtigungen für Branches",
     "addSubtitle": "Berechtigung hinzufügen",
+    "noPermissions": "Keine Branch Berechtigungen gefunden",
     "form": {
       "permissionType": "Art der Berechtigung",
       "userPermission": "Benutzer berechtigen",

@@ -22,22 +22,19 @@ const styles = {
   centerMiddle: {
     display: "table-cell",
     verticalAlign: "middle !important"
-  },
-  columnWidth: {
-    width: "100%"
   }
 };
 
 class BranchWPRow extends React.Component<Props> {
   confirmDelete = () => {
-    const { t } = this.props;
+    const { t, onDelete, permission } = this.props;
     confirmAlert({
       title: t("scm-branchwp-plugin.confirmDeleteAlert.title"),
       message: t("scm-branchwp-plugin.confirmDeleteAlert.message"),
       buttons: [
         {
           label: t("scm-branchwp-plugin.confirmDeleteAlert.submit"),
-          onClick: () => this.props.onDelete(this.props.permission)
+          onClick: () => onDelete(permission)
         },
         {
           label: t("scm-branchwp-plugin.confirmDeleteAlert.cancel"),
@@ -64,7 +61,7 @@ class BranchWPRow extends React.Component<Props> {
       );
 
     return (
-      <tr className={classes.columnWidth}>
+      <tr>
         <td className={classes.centerMiddle}>
           {iconType} {permission.name}
         </td>

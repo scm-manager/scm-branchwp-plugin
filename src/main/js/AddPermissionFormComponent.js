@@ -18,6 +18,7 @@ type Props = {
   groupAutocompleteLink: string,
   readOnly: boolean,
   onAdd: BranchWP => void,
+
   // Context props
   t: string => string
 };
@@ -123,9 +124,9 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
       <>
         <hr />
         <Subtitle subtitle={t("scm-branchwp-plugin.addSubtitle")} />
-        <LabelWithHelpIcon
-          label={t("scm-branchwp-plugin.form.permissionType")}
-        />
+        <label className="label">
+          {t("scm-branchwp-plugin.form.permissionType")}
+        </label>
         <div className="columns is-multiline">
           <div className="column is-full">
             <div className="field is-grouped">

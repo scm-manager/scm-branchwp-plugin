@@ -5,6 +5,7 @@
     "enableHelpText": "If enabled, nobody can write to the repository expect administrators, repository owners and the specified rules.",
     "editSubtitle": "Write permission for branches",
     "addSubtitle": "Add permission",
+    "noPermissions": "No branch permissions found.",
     "form": {
       "permissionType": "Permission type",
       "userPermission": "User Permission",

@@ -1,6 +1,7 @@
 // @flow
 import React from "react";
 import { translate } from "react-i18next";
+import { Notification } from "@scm-manager/ui-components";
 import type { BranchWP } from "../types/BranchWP";
 import BranchWPRow from "./BranchWPRow";
 
@@ -14,33 +15,40 @@ type Props = {
 
 class BranchWPTable extends React.Component<Props> {
   render() {
-    const { permissions, t } = this.props;
+    const { permissions, onDelete, t } = this.props;
 
-    const tableRows = permissions.map(branchWP => {
+    if (permissions && permissions[0]) {
+      const tableRows = permissions.map(branchWP => {
+        return (
+          <>
+            <BranchWPRow
+              permission={branchWP}
+              onDelete={permission => {
+                onDelete(permission);
+              }}
+            />
+          </>
+        );
+      });
+
       return (
-        <>
-          <BranchWPRow
-            permission={branchWP}
-            onDelete={permission => {
-              this.props.onDelete(permission);
-            }}
-          />
-        </>
+        <table className="has-background-light table is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>{t("scm-branchwp-plugin.table.name")}</th>
+              <th>{t("scm-branchwp-plugin.table.branch")}</th>
+              <th>{t("scm-branchwp-plugin.table.permission")}</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>{tableRows}</tbody>
+        </table>
       );
-    });
-
+    }
     return (
-      <table className="has-background-light table is-hoverable is-fullwidth">
-        <thead>
-          <tr>
-            <th>{t("scm-branchwp-plugin.table.name")}</th>
-            <th>{t("scm-branchwp-plugin.table.branch")}</th>
-            <th>{t("scm-branchwp-plugin.table.permission")}</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>{tableRows}</tbody>
-      </table>
+      <Notification type="info">
+        {t("scm-branchwp-plugin.noPermissions")}
+      </Notification>
     );
   }
 }
