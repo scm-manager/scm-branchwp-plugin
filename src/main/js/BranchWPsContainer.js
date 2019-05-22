@@ -1,24 +1,18 @@
 // @flow
 import React from "react";
 import { Configuration } from "@scm-manager/ui-components";
-import { translate } from "react-i18next";
 import type { Repository } from "@scm-manager/ui-types";
 import BranchWPsForm from "./BranchWPsForm";
 
 type Props = {
   repository: Repository,
   link: string,
-  indexLinks: Object,
-  t: string => string
+  indexLinks: Object
 };
 
 class BranchWPsContainer extends React.Component<Props> {
-  constructor(props: Props) {
-    super(props);
-  }
-
   render() {
-    const { t, link, indexLinks } = this.props;
+    const { link, indexLinks } = this.props;
     const userAutoCompleteLink = indexLinks.autocomplete.find(
       link => link.name === "users"
     ).href;
@@ -40,4 +34,4 @@ class BranchWPsContainer extends React.Component<Props> {
   }
 }
 
-export default translate("plugins")(BranchWPsContainer);
+export default BranchWPsContainer;

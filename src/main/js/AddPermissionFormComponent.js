@@ -122,23 +122,23 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
     return (
       <>
         <hr />
-        <Subtitle subtitle={t("scm-branchwp-plugin.form.add-permission")} />
+        <Subtitle subtitle={t("scm-branchwp-plugin.addSubtitle")} />
         <LabelWithHelpIcon
-          label={t("scm-branchwp-plugin.form.permission-type")}
+          label={t("scm-branchwp-plugin.form.permissionType")}
         />
         <div className="columns is-multiline">
           <div className="column is-full">
             <div className="field is-grouped">
               <div className="control">
                 <Radio
-                  label={t("scm-branchwp-plugin.form.user-permission")}
+                  label={t("scm-branchwp-plugin.form.userPermission")}
                   name="permission_scope"
                   value="USER_PERMISSION"
                   checked={!this.state.branchProtectionPermission.group}
                   onChange={this.permissionScopeChanged}
                 />
                 <Radio
-                  label={t("scm-branchwp-plugin.form.group-permission")}
+                  label={t("scm-branchwp-plugin.form.groupPermission")}
                   name="permission_scope"
                   value="GROUP_PERMISSION"
                   checked={this.state.branchProtectionPermission.group}
@@ -152,7 +152,7 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
               name={"branch"}
               placeholder={t("scm-branchwp-plugin.form.branch")}
               label={t("scm-branchwp-plugin.form.branch")}
-              helpText={t("scm-branchwp-plugin.form.branch-help-text")}
+              helpText={t("scm-branchwp-plugin.form.branchHelpText")}
               value={branch}
               onChange={this.handleBranchExpressionChange}
               disabled={readOnly}
@@ -166,7 +166,7 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
               <div className="column is-narrow">
                 <LabelWithHelpIcon
                   label={t("scm-branchwp-plugin.form.permission")}
-                  helpText={t("scm-branchwp-plugin.form.permission-help-text")}
+                  helpText={t("scm-branchwp-plugin.form.permissionHelpText")}
                 />
                 <DropDown
                   options={["ALLOW", "DENY"]}
@@ -203,14 +203,11 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
     const { t } = this.props;
     const group = this.state.branchProtectionPermission.group;
     const label = group
-      ? t("scm-branchwp-plugin.form.group-name")
-      : t("scm-branchwp-plugin.form.user-name");
+      ? t("scm-branchwp-plugin.form.groupLabel")
+      : t("scm-branchwp-plugin.form.userLabel");
     const helpText = group
-      ? t("scm-branchwp-plugin.form.group-name-help-text")
-      : t("scm-branchwp-plugin.form.user-name-help-text");
-    const placeholder = group
-      ? t("scm-branchwp-plugin.form.group-name")
-      : t("scm-branchwp-plugin.form.user-name");
+      ? t("scm-branchwp-plugin.form.groupHelpText")
+      : t("scm-branchwp-plugin.form.userHelpText");
     const loadSuggestions = group
       ? this.loadGroupSuggestions
       : this.loadUserSuggestions;
@@ -221,7 +218,7 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
         helpText={helpText}
         valueSelected={this.selectName}
         value={this.state.selectedValue}
-        placeholder={placeholder}
+        placeholder={label}
       />
     );
   };

@@ -12,6 +12,7 @@ type Props = {
   onConfigurationChange: (BranchWPs, boolean) => void,
   userAutocompleteLink: string,
   groupAutocompleteLink: string,
+
   // context prop
   t: string => string
 };
@@ -97,13 +98,13 @@ class BranchWPsForm extends React.Component<Props, State> {
         <Checkbox
           checked={enabled}
           onChange={this.onChangeEnabled}
-          label={t("scm-branchwp-plugin.is-enabled")}
-          helpText={t("scm-branchwp-plugin.is-enabled-help-text")}
+          label={t("scm-branchwp-plugin.enable")}
+          helpText={t("scm-branchwp-plugin.enableHelpText")}
         />
         {enabled ? (
           <>
             <hr />
-            <Subtitle subtitle={t("scm-branchwp-plugin.form.title")} />
+            <Subtitle subtitle={t("scm-branchwp-plugin.editSubtitle")} />
             <BranchWPTable
               permissions={this.state.permissions}
               onDelete={this.onDelete}
