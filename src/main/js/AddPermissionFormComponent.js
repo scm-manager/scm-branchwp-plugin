@@ -1,17 +1,17 @@
 // @flow
 import React from "react";
+import { translate } from "react-i18next";
+import type { SelectValue } from "@scm-manager/ui-types";
 import {
   Autocomplete,
   Button,
   InputField,
   Radio,
   DropDown,
-  Subtitle
+  Subtitle,
+  LabelWithHelpIcon
 } from "@scm-manager/ui-components";
-import { translate } from "react-i18next";
 import type { BranchWP } from "./BranchWP";
-import type { SelectValue } from "@scm-manager/ui-types";
-import LabelWithHelpIcon from "@scm-manager/ui-components/src/forms/LabelWithHelpIcon";
 
 type Props = {
   userAutocompleteLink: string,
@@ -125,7 +125,6 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
         <Subtitle subtitle={t("scm-branchwp-plugin.form.add-permission")} />
         <LabelWithHelpIcon
           label={t("scm-branchwp-plugin.form.permission-type")}
-          helpText={t("scm-branchwp-plugin.form.permission-type-help-text")}
         />
         <div className="columns is-multiline">
           <div className="column is-full">
@@ -179,7 +178,13 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
               <div className="column">
                 <Button
                   label={t("scm-branchwp-plugin.form.add")}
-                  disabled={this.props.readOnly}
+                  disabled={
+                    this.props.readOnly ||
+                    !branch ||
+                    !(
+                      this.state.selectedValue && this.state.selectedValue.label
+                    )
+                  }
                   action={() => {
                     this.props.onAdd(this.state.branchProtectionPermission);
                     this.setState({ ...defaultState });
