@@ -36,7 +36,7 @@ class BranchWPTable extends React.Component<Props> {
           <tr>
             <th>{t("scm-branchwp-plugin.table.name")}</th>
             <th>{t("scm-branchwp-plugin.table.branch")}</th>
-            <th>{t("scm-branchwp-plugin.table.permissions")}</th>
+            <th>{t("scm-branchwp-plugin.table.permission")}</th>
             <th />
           </tr>
         </thead>

@@ -3,7 +3,7 @@
     "table" :{
       "name": "Benutzer oder Gruppe",
       "branch": "Branch",
-      "permissions": "Berechtigungen",
+      "permission": "Berechtigung",
       "user": "Benutzer",
       "group": "Gruppe",
       "delete" : "Löschen"
@@ -25,10 +25,9 @@
       "user-permission": "Benutzer berechtigen",
       "permission": "Berechtigung",
       "add-permission": "Berechtigung hinzufügen",
-      "permission-type": "Art der Berechtigung",
-      "permission-type-help-text": "Festlegung der Art der Berechtigung."
+      "permission-type": "Art der Berechtigung"
     },
-    "confirm-delete": {
+    "confirmDeleteAlert": {
       "title": "Löschen der Branch-Berechtigung",
       "message": "Soll die Branch-Berechtigung wirklich gelöscht werden?",
       "submit": "Ja (Speichern nicht vergessen)",

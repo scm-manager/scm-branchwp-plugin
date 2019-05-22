@@ -58,6 +58,7 @@ class BranchWPTableRow extends React.Component<Props> {
             onClick={() => {
               this.props.onDelete(this.props.permission);
             }}
+            title={t("scm-branchwp-plugin.table.delete")}
           >
             <span className="icon is-small">
               <i className="fas fa-trash" />
