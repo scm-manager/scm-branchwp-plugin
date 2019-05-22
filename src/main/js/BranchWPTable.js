@@ -1,7 +1,7 @@
 // @flow
 
 import React from "react";
-import type { BranchWP } from "./BranchWP";
+import type { BranchWP } from "./types/BranchWP";
 import BranchWPTableRow from "./BranchWPTableRow";
 import { translate } from "react-i18next";
 

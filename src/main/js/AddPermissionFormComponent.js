@@ -11,7 +11,7 @@ import {
   Subtitle,
   LabelWithHelpIcon
 } from "@scm-manager/ui-components";
-import type { BranchWP } from "./BranchWP";
+import type { BranchWP } from "./types/BranchWP";
 
 type Props = {
   userAutocompleteLink: string,

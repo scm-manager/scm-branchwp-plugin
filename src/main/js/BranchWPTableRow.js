@@ -4,7 +4,7 @@ import { translate } from "react-i18next";
 import injectSheet from "react-jss";
 import classNames from "classnames";
 import { confirmAlert } from "@scm-manager/ui-components";
-import type { BranchWP } from "./BranchWP";
+import type { BranchWP } from "./types/BranchWP";
 
 type Props = {
   permission: BranchWP,
