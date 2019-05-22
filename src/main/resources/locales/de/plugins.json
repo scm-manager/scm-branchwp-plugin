@@ -1,17 +1,17 @@
 {
   "scm-branchwp-plugin": {
-    "navLink": "Branch Berechtigungen",
+    "navLink": "Branch-Berechtigungen",
     "enable": "Schreib-Berechtigungen für Branches aktivieren",
     "enableHelpText": "Wenn diese Option aktiv ist, können nur Administratoren, Owner des Repositories und die spezifizierten Regeln auf dem Repository schreiben.",
     "editSubtitle": "Schreib-Berechtigungen für Branches",
     "addSubtitle": "Berechtigung hinzufügen",
-    "noPermissions": "Keine Branch Berechtigungen gefunden",
+    "noPermissions": "Keine Branch-Berechtigungen gefunden",
     "form": {
       "permissionType": "Art der Berechtigung",
       "userPermission": "Benutzer berechtigen",
       "groupPermission": "Gruppe berechtigen",
       "branch": "Branch",
-      "branchHelpText": "Hier kann ein Branch-Name oder Muster angegeben werden. Diese Muster können mit user, mail und username ersetzt werden: feature/* {mail}/* {username}/feature* {mail} und {username} ",
+      "branchHelpText": "Hier kann ein Branch-Name oder Muster angegeben werden. Diese Muster können mit user, mail und username ersetzt werden: feature/* {mail}/* {username}/feature* {mail} und {username}.",
       "groupLabel": "Gruppe auswählen",
       "userLabel": "Benutzer auswählen",
       "groupHelpText": "Auswahl der Gruppe, die für den Branch berechtigt werden soll.",
@@ -22,6 +22,7 @@
     },
     "table": {
       "name": "Benutzer oder Gruppe",
+      "nameHelpText": "Verwaltung von Berechtigungen für Benutzer und Gruppen",
       "branch": "Branch",
       "permission": "Berechtigung",
       "group": "Gruppe",

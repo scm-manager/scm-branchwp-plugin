@@ -1,7 +1,7 @@
 // @flow
 import React from "react";
 import { translate } from "react-i18next";
-import { Notification } from "@scm-manager/ui-components";
+import { LabelWithHelpIcon, Notification } from "@scm-manager/ui-components";
 import type { BranchWP } from "../types/BranchWP";
 import BranchWPRow from "./BranchWPRow";
 
@@ -35,7 +35,12 @@ class BranchWPTable extends React.Component<Props> {
         <table className="has-background-light table is-hoverable is-fullwidth">
           <thead>
             <tr>
-              <th>{t("scm-branchwp-plugin.table.name")}</th>
+              <th>
+                <LabelWithHelpIcon
+                  label={t("scm-branchwp-plugin.table.name")}
+                  helpText={t("scm-branchwp-plugin.table.nameHelpText")}
+                />
+              </th>
               <th>{t("scm-branchwp-plugin.table.branch")}</th>
               <th>{t("scm-branchwp-plugin.table.permission")}</th>
               <th />

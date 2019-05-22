@@ -11,7 +11,7 @@
       "userPermission": "User Permission",
       "groupPermission": "Group Permission",
       "branch": "Branch",
-      "branchHelpText": "Enter a branch name or a pattern like feature/* {mail}/* {username}/feature* {mail} and {username} would be replaced with the user mail and username ",
+      "branchHelpText": "Enter a branch name or a pattern like feature/* {mail}/* {username}/feature* {mail} and {username} would be replaced with the user mail and username.",
       "groupLabel": "Select Group",
       "userLabel": "Select User",
       "groupHelpText": "Select the group to be privileged for the branch",
@@ -22,6 +22,7 @@
     },
     "table": {
       "name": "User or group",
+      "nameHelpText": "Manage permissions for a specific user or group.",
       "branch": "Branch",
       "permission": "Permission",
       "group": "Group",
