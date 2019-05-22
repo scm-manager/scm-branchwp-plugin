@@ -10,6 +10,7 @@ type Props = {
   // permissionListChanged: (permissions: BranchWP[]) => void
   onDelete: BranchWP => void,
 
+  // context prop
   t: string => string
 };
 

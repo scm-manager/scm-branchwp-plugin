@@ -1,35 +1,61 @@
 {
   "scm-branchwp-plugin": {
+    "table" :{
+      "name": "Benutzer oder Gruppe",
+      "branch": "Branch",
+      "permissions": "Berechtigungen",
+      "user": "Benutzer",
+      "group": "Gruppe",
+      "delete" : "Löschen"
+    },
     "form": {
-      "title": "Bearbeitung von write- Berechtigungen für Branches",
+      "title": "Schreib-Berechtigungen für Branches",
       "group": "Berechtigung für Gruppe",
       "user": "Berechtigung für Benutzer",
-      "permission-help-text": "Auswahl der Branch Write Berechtigung.",
+      "permission-help-text": "Auswahl der Branch Schreib-Berechtigung.",
       "group-name": "Gruppe auswählen",
       "user-name": "Benutzer auswählen",
       "group-name-help-text": "Auswahl der Gruppe, die für den Branch berechtigt werden soll.",
       "user-name-help-text": "Auswahl des Benutzers, der für den Branch berechtigt werden soll.",
       "branch": "Branch",
-      "branch-help-text": "Eingabe eines Enter Branchnamens oder von Mustern. Diese Muster würden mit user, mail und username ersetzt werden: feature/* {mail}/* {username}/feature* {mail} und {username} ",
+      "branch-help-text": "Hier kann ein Branch-Name oder Muster angegeben werden. Diese Muster können mit user, mail und username ersetzt werden: feature/* {mail}/* {username}/feature* {mail} und {username} ",
       "permission-help-message": "Auswahl der Berechtigung.",
       "add": "Hinzufügen",
-      "group-permission": "Berechtigung für Gruppe",
-      "user-permission": "Berechtigung für Benutzer",
+      "group-permission": "Gruppe berechtigen",
+      "user-permission": "Benutzer berechtigen",
       "permission": "Berechtigung",
       "add-permission": "Berechtigung hinzufügen",
       "permission-type": "Art der Berechtigung",
-      "permission-type-help-text": "Spezifizierung der Art der Berechtigung."
+      "permission-type-help-text": "Festlegung der Art der Berechtigung."
     },
     "confirm-delete": {
-      "title": "Löschen der Branch- Berechtigung",
-      "message": "Soll die Branch- Berechtigung wirklich gelöscht werden?",
-      "submit": "Ja (nicht das Speichern vergessen)",
+      "title": "Löschen der Branch-Berechtigung",
+      "message": "Soll die Branch-Berechtigung wirklich gelöscht werden?",
+      "submit": "Ja (Speichern nicht vergessen)",
       "cancel": "Nein"
     },
     "nav-link": "Branch Berechtigungen",
     "add-user-permission": "Berechtigung für Benutzer hinzufügen ",
     "add-group-permission": "Berechtigung für Gruppe hinzufügen ",
-    "is-enabled": "Branch Write Berechtigungen aktivieren",
+    "is-enabled": "Schreib-Berechtigungen für Branches aktivieren",
     "is-enabled-help-text": "Wenn diese Option aktiv ist, können nur Administratoren, Owner des Repositories und die spezifizierten Regeln auf dem Repository schreiben."
+  },
+  "permissions": {
+    "repository": {
+      "branchwp": {
+        "*": {
+          "displayName": "Repository-spezifische Schreibrechte für Branches ändern",
+          "description": "Darf die repository-spezifischen Schreibrechte für Branches verändern"
+        }
+      }
+    }
+  },
+  "verbs": {
+    "repository": {
+      "branchwp": {
+        "displayName": "Schreibrechte für Branches ändern",
+        "description": "Darf die Schreibrechte für Branches verändern"
+      }
+    }
   }
 }

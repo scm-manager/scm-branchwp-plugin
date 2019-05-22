@@ -19,7 +19,7 @@ import java.util.List;
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class BranchWritePermissions {
 
-  private boolean isEnabled = true;
+  private boolean isEnabled = false;
   @XmlElement(name = "permission")
   private List<BranchWritePermission> permissions = new ArrayList<>();
 
