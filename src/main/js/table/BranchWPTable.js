@@ -1,13 +1,11 @@
 // @flow
-
 import React from "react";
-import type { BranchWP } from "./types/BranchWP";
-import BranchWPTableRow from "./BranchWPTableRow";
 import { translate } from "react-i18next";
+import type { BranchWP } from "../types/BranchWP";
+import BranchWPRow from "./BranchWPRow";
 
 type Props = {
   permissions: BranchWP[],
-  // permissionListChanged: (permissions: BranchWP[]) => void
   onDelete: BranchWP => void,
 
   // context prop
@@ -21,7 +19,7 @@ class BranchWPTable extends React.Component<Props> {
     const tableRows = permissions.map(branchWP => {
       return (
         <>
-          <BranchWPTableRow
+          <BranchWPRow
             permission={branchWP}
             onDelete={permission => {
               this.props.onDelete(permission);
@@ -30,6 +28,7 @@ class BranchWPTable extends React.Component<Props> {
         </>
       );
     });
+
     return (
       <table className="has-background-light table is-hoverable is-fullwidth">
         <thead>

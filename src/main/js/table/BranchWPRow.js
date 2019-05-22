@@ -4,7 +4,7 @@ import { translate } from "react-i18next";
 import injectSheet from "react-jss";
 import classNames from "classnames";
 import { confirmAlert } from "@scm-manager/ui-components";
-import type { BranchWP } from "./types/BranchWP";
+import type { BranchWP } from "../types/BranchWP";
 
 type Props = {
   permission: BranchWP,
@@ -28,7 +28,7 @@ const styles = {
   }
 };
 
-class BranchWPTableRow extends React.Component<Props> {
+class BranchWPRow extends React.Component<Props> {
   confirmDelete = () => {
     const { t } = this.props;
     confirmAlert({
@@ -86,4 +86,4 @@ class BranchWPTableRow extends React.Component<Props> {
   }
 }
 
-export default translate("plugins")(injectSheet(styles)(BranchWPTableRow));
+export default translate("plugins")(injectSheet(styles)(BranchWPRow));
