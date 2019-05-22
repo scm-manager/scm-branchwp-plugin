@@ -1,10 +1,10 @@
 // @flow
-
 import React from "react";
-import type { BranchWP } from "./BranchWP";
 import { translate } from "react-i18next";
-import classNames from "classnames";
 import injectSheet from "react-jss";
+import classNames from "classnames";
+import { confirmAlert } from "@scm-manager/ui-components";
+import type { BranchWP } from "./BranchWP";
 
 type Props = {
   permission: BranchWP,
@@ -29,6 +29,24 @@ const styles = {
 };
 
 class BranchWPTableRow extends React.Component<Props> {
+  confirmDelete = () => {
+    const { t } = this.props;
+    confirmAlert({
+      title: t("scm-branchwp-plugin.confirmDeleteAlert.title"),
+      message: t("scm-branchwp-plugin.confirmDeleteAlert.message"),
+      buttons: [
+        {
+          label: t("scm-branchwp-plugin.confirmDeleteAlert.submit"),
+          onClick: () => this.props.onDelete(this.props.permission)
+        },
+        {
+          label: t("scm-branchwp-plugin.confirmDeleteAlert.cancel"),
+          onClick: () => null
+        }
+      ]
+    });
+  };
+
   render() {
     const { permission, classes, t } = this.props;
 
@@ -55,9 +73,7 @@ class BranchWPTableRow extends React.Component<Props> {
         <td>
           <a
             className="level-item"
-            onClick={() => {
-              this.props.onDelete(this.props.permission);
-            }}
+            onClick={this.confirmDelete}
             title={t("scm-branchwp-plugin.table.delete")}
           >
             <span className="icon is-small">
