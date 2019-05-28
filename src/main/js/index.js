@@ -5,7 +5,7 @@ import BranchWPsContainer from "./BranchWPsContainer";
 
 cfgBinder.bindRepositorySetting(
   "/branchwp",
-  "scm-branchwp-plugin.nav-link",
+  "scm-branchwp-plugin.navLink",
   "branchWpConfig",
   BranchWPsContainer
 );
