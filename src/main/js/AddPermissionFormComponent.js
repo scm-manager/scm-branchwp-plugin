@@ -3,7 +3,6 @@ import React from "react";
 import { translate } from "react-i18next";
 import type { SelectValue } from "@scm-manager/ui-types";
 import {
-  Autocomplete,
   Button,
   InputField,
   Radio,
@@ -12,6 +11,8 @@ import {
   LabelWithHelpIcon
 } from "@scm-manager/ui-components";
 import type { BranchWP } from "./types/BranchWP";
+import GroupAutocomplete from "./GroupAutocomplete";
+import UserAutocomplete from "./UserAutocomplete";
 
 type Props = {
   userAutocompleteLink: string,
@@ -22,6 +23,7 @@ type Props = {
   // Context props
   t: string => string
 };
+
 type State = {
   branchProtectionPermission: BranchWP,
   selectedValue: SelectValue
@@ -45,34 +47,6 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
     super(props);
     this.state = defaultState;
   }
-
-  loadUserSuggestions = (inputValue: string) => {
-    return this.loadAutocompletion(this.props.userAutocompleteLink, inputValue);
-  };
-
-  loadGroupSuggestions = (inputValue: string) => {
-    return this.loadAutocompletion(
-      this.props.groupAutocompleteLink,
-      inputValue
-    );
-  };
-
-  loadAutocompletion = (url: string, inputValue: string) => {
-    const link = url + "?q=";
-    return fetch(link + inputValue)
-      .then(response => response.json())
-      .then(json => {
-        return json.map(element => {
-          const label = element.displayName
-            ? `${element.displayName} (${element.id})`
-            : element.id;
-          return {
-            value: element,
-            label
-          };
-        });
-      });
-  };
 
   handleDropDownChange = (type: string) => {
     this.setState({
@@ -112,7 +86,8 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
       branchProtectionPermission: {
         ...this.state.branchProtectionPermission,
         group
-      }
+      },
+      selectedValue: null
     });
   };
 
@@ -124,11 +99,11 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
       <>
         <hr />
         <Subtitle subtitle={t("scm-branchwp-plugin.addSubtitle")} />
-        <label className="label">
-          {t("scm-branchwp-plugin.form.permissionType")}
-        </label>
         <div className="columns is-multiline">
           <div className="column is-full">
+            <label className="label">
+              {t("scm-branchwp-plugin.form.permissionType")}
+            </label>
             <div className="field is-grouped">
               <div className="control">
                 <Radio
@@ -201,25 +176,21 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
   }
 
   renderAutocomplete = () => {
-    const { t } = this.props;
-    const group = this.state.branchProtectionPermission.group;
-    const label = group
-      ? t("scm-branchwp-plugin.form.groupLabel")
-      : t("scm-branchwp-plugin.form.userLabel");
-    const helpText = group
-      ? t("scm-branchwp-plugin.form.groupHelpText")
-      : t("scm-branchwp-plugin.form.userHelpText");
-    const loadSuggestions = group
-      ? this.loadGroupSuggestions
-      : this.loadUserSuggestions;
+    const group = this.state.pathProtectionPermission.group;
+    if (group) {
+      return (
+        <GroupAutocomplete
+          groupAutocompleteLink={this.props.groupAutocompleteLink}
+          valueSelected={this.selectName}
+          value={this.state.selectedValue}
+        />
+      );
+    }
     return (
-      <Autocomplete
-        label={label}
-        loadSuggestions={loadSuggestions}
-        helpText={helpText}
+      <UserAutocomplete
+        userAutocompleteLink={this.props.userAutocompleteLink}
         valueSelected={this.selectName}
         value={this.state.selectedValue}
-        placeholder={label}
       />
     );
   };
