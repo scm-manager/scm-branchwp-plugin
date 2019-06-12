@@ -134,12 +134,10 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
               disabled={readOnly}
             />
           </div>
-          <div className="column is-three-fifths">
-            {this.renderAutocomplete()}
-          </div>
-          <div className="column is-two-fifths">
+          <div className="column">{this.renderAutocomplete()}</div>
+          <div className="column">
             <div className="columns">
-              <div className="column is-one-third">
+              <div className="column">
                 <LabelWithHelpIcon
                   label={t("scm-branchwp-plugin.form.permission")}
                   helpText={t("scm-branchwp-plugin.form.permissionHelpText")}
@@ -176,7 +174,7 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
   }
 
   renderAutocomplete = () => {
-    const group = this.state.pathProtectionPermission.group;
+    const group = this.state.branchProtectionPermission.group;
     if (group) {
       return (
         <GroupAutocomplete
