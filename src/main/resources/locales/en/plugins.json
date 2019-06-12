@@ -12,10 +12,6 @@
       "groupPermission": "Group Permission",
       "branch": "Branch",
       "branchHelpText": "Enter a branch name or a pattern like feature/* {mail}/* {username}/feature* {mail} and {username} would be replaced with the user mail and username.",
-      "groupLabel": "Select Group",
-      "userLabel": "Select User",
-      "groupHelpText": "Select the group to be privileged for the branch",
-      "userHelpText": "Select the user to be privileged for the branch",
       "permission": "Permission",
       "permissionHelpText": "Select the branch write permission",
       "add": "Add"

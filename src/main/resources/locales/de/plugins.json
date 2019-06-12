@@ -12,10 +12,6 @@
       "groupPermission": "Gruppe berechtigen",
       "branch": "Branch",
       "branchHelpText": "Hier kann ein Branch-Name oder Muster angegeben werden. Diese Muster können mit user, mail und username ersetzt werden: feature/* {mail}/* {username}/feature* {mail} und {username}.",
-      "groupLabel": "Gruppe auswählen",
-      "userLabel": "Benutzer auswählen",
-      "groupHelpText": "Auswahl der Gruppe, die für den Branch berechtigt werden soll.",
-      "userHelpText": "Auswahl des Benutzers, der für den Branch berechtigt werden soll.",
       "permission": "Berechtigung",
       "permissionHelpText": "Auswahl der Branch Schreib-Berechtigung.",
       "add": "Hinzufügen"
