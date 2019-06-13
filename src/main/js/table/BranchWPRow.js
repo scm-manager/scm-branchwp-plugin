@@ -4,6 +4,7 @@ import { translate } from "react-i18next";
 import injectSheet from "react-jss";
 import { confirmAlert, Icon } from "@scm-manager/ui-components";
 import type { BranchWP } from "../types/BranchWP";
+import classNames from "classnames";
 
 type Props = {
   permission: BranchWP,
@@ -60,7 +61,7 @@ class BranchWPRow extends React.Component<Props> {
         </td>
         <td>{permission.branch}</td>
         <td>{permission.type}</td>
-        <td>
+        <td className={classNames("is-darker", classes.centerMiddle)}>
           <a
             className="level-item"
             onClick={this.confirmDelete}
