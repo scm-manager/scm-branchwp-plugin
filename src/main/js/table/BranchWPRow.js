@@ -2,9 +2,9 @@
 import React from "react";
 import { translate } from "react-i18next";
 import injectSheet from "react-jss";
-import classNames from "classnames";
-import { confirmAlert } from "@scm-manager/ui-components";
+import { confirmAlert, Icon } from "@scm-manager/ui-components";
 import type { BranchWP } from "../types/BranchWP";
+import classNames from "classnames";
 
 type Props = {
   permission: BranchWP,
@@ -16,9 +16,6 @@ type Props = {
 };
 
 const styles = {
-  iconColor: {
-    color: "#9a9a9a"
-  },
   centerMiddle: {
     display: "table-cell",
     verticalAlign: "middle !important"
@@ -49,15 +46,12 @@ class BranchWPRow extends React.Component<Props> {
 
     const iconType =
       permission && permission.group ? (
-        <i
+        <Icon
           title={t("scm-branchwp-plugin.table.group")}
-          className={classNames("fas fa-user-friends", classes.iconColor)}
+          name="user-friends"
         />
       ) : (
-        <i
-          title={t("scm-branchwp-plugin.table.user")}
-          className={classNames("fas fa-user", classes.iconColor)}
-        />
+        <Icon title={t("scm-branchwp-plugin.table.user")} name="user" />
       );
 
     return (
@@ -67,7 +61,7 @@ class BranchWPRow extends React.Component<Props> {
         </td>
         <td>{permission.branch}</td>
         <td>{permission.type}</td>
-        <td>
+        <td className={classNames("is-darker", classes.centerMiddle)}>
           <a
             className="level-item"
             onClick={this.confirmDelete}
