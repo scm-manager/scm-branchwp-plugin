@@ -40,7 +40,6 @@ public class BranchWritePermissionServiceTest {
   @Rule
   public ShiroRule shiro = new ShiroRule();
 
-  @Mock
   ConfigurationStore<BranchWritePermissions> store;
 
   ConfigurationStoreFactory storeFactory;
@@ -51,8 +50,9 @@ public class BranchWritePermissionServiceTest {
 
   @Before
   public void init() {
-    storeFactory = new InMemoryConfigurationStoreFactory(store);
+    storeFactory = new InMemoryConfigurationStoreFactory();
     service = new BranchWritePermissionService(storeFactory, null);
+    store = storeFactory.withType(BranchWritePermissions.class).withName("branchWritePermission").build();
   }
 
   public BranchWritePermissionServiceTest() {
@@ -72,12 +72,7 @@ public class BranchWritePermissionServiceTest {
     permissions.getPermissions().add(permission);
     service.setPermissions(REPOSITORY, permissions);
 
-    verify(store).set(argThat(argPermissions -> {
-      assertThat(argPermissions.getPermissions()).hasSize(1);
-      assertThat(argPermissions.getPermissions().get(0))
-        .isEqualToComparingFieldByField(createBranchWritePermission());
-      return true;
-    }));
+    assertThat(store.get()).isSameAs(permissions);
   }
 
   @Test
@@ -86,10 +81,9 @@ public class BranchWritePermissionServiceTest {
 
     BranchWritePermission permission = createBranchWritePermission();
     permissions.getPermissions().add(permission);
+    store.set(permissions);
 
     assertThatThrownBy(() -> service.setPermissions(REPOSITORY, permissions)).hasMessage("Subject does not have permission [repository:branchwp:id-1]");
-
-    verify(store, never()).set(any());
   }
 
   @Test
@@ -97,7 +91,7 @@ public class BranchWritePermissionServiceTest {
     BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission = new BranchWritePermission("{username}/feature/*", USER.getName(), false, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(branchWritePermission);
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
 
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME), REPOSITORY, USERNAME + "/feature/branch_1");
 
@@ -109,7 +103,7 @@ public class BranchWritePermissionServiceTest {
     BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission2 = new BranchWritePermission("{mail}/feature/*", USER.getName(), false, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(branchWritePermission2);
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
 
     Boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME), REPOSITORY, MAIL + "/feature/branch_1");
 
@@ -123,7 +117,6 @@ public class BranchWritePermissionServiceTest {
     boolean privileged = service.isPrivileged(admin, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
 
     assertThat(privileged).isTrue();
-    verify(store, never()).get();
   }
 
   @Test
@@ -133,24 +126,22 @@ public class BranchWritePermissionServiceTest {
     boolean privileged = service.isPrivileged(admin, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
 
     assertThat(privileged).isTrue();
-    verify(store, never()).get();
   }
 
   @Test
   public void shouldAllowAnyUserIfTheConfigIsDisabled() {
     BranchWritePermissions permissions = createBranchWPs(false);
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
 
     assertThat(privileged).isTrue();
-    verify(store).get();
   }
 
   @Test
   public void shouldPrivilegeUserBecauseTheBranchIsAllowedToTheUser() {
     BranchWritePermissions permissions = createBranchWPs(true);
     permissions.getPermissions().add(createBranchWritePermission());
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
 
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
 
@@ -162,7 +153,7 @@ public class BranchWritePermissionServiceTest {
     BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission = new BranchWritePermission("*", USER.getName(), false, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(branchWritePermission);
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
 
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
 
@@ -174,7 +165,7 @@ public class BranchWritePermissionServiceTest {
     BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission = new BranchWritePermission("*", GROUP_NAME, true, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(branchWritePermission);
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
 
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME, "group2", "group3"), REPOSITORY, BRANCH);
 
@@ -186,7 +177,7 @@ public class BranchWritePermissionServiceTest {
     BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission branchWritePermission = new BranchWritePermission(BRANCH, GROUP_NAME, true, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(branchWritePermission);
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
 
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME, "group2", "group3"), REPOSITORY, BRANCH);
 
@@ -206,7 +197,7 @@ public class BranchWritePermissionServiceTest {
     BranchWritePermission deniedPermission = new BranchWritePermission(BRANCH, USER.getName(), false, BranchWritePermission.Type.DENY);
     permissions.getPermissions().add(branchWritePermission);
     permissions.getPermissions().add(deniedPermission);
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
 
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
 
@@ -220,7 +211,7 @@ public class BranchWritePermissionServiceTest {
     BranchWritePermission deniedPermission = new BranchWritePermission(BRANCH, USER.getName(), false, BranchWritePermission.Type.DENY);
     permissions.getPermissions().add(branchWritePermission);
     permissions.getPermissions().add(deniedPermission);
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
 
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME, "group2", "group3"), REPOSITORY, BRANCH);
 
@@ -232,7 +223,7 @@ public class BranchWritePermissionServiceTest {
     BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission deniedPermission = new BranchWritePermission(BRANCH, USER.getName(), false, BranchWritePermission.Type.DENY);
     permissions.getPermissions().add(deniedPermission);
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
 
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
 
@@ -244,7 +235,7 @@ public class BranchWritePermissionServiceTest {
     BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission deniedPermission = new BranchWritePermission(BRANCH, GROUP_NAME, true, BranchWritePermission.Type.DENY);
     permissions.getPermissions().add(deniedPermission);
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
 
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME, "group2", "group3"), REPOSITORY, BRANCH);
 
@@ -256,7 +247,7 @@ public class BranchWritePermissionServiceTest {
     BranchWritePermissions permissions = createBranchWPs(true);
     BranchWritePermission deniedPermission = new BranchWritePermission("other_branch", USER.getName(), false, BranchWritePermission.Type.ALLOW);
     permissions.getPermissions().add(deniedPermission);
-    when(store.get()).thenReturn(permissions);
+    store.set(permissions);
 
     boolean privileged = service.isPrivileged(USER, new GroupNames(GROUP_NAME), REPOSITORY, BRANCH);
 
