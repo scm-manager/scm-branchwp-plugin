@@ -3,13 +3,14 @@ import React from "react";
 import { translate } from "react-i18next";
 import type { SelectValue } from "@scm-manager/ui-types";
 import {
-  Autocomplete,
   Button,
   InputField,
   Radio,
   DropDown,
   Subtitle,
-  LabelWithHelpIcon
+  LabelWithHelpIcon,
+  GroupAutocomplete,
+  UserAutocomplete
 } from "@scm-manager/ui-components";
 import type { BranchWP } from "./types/BranchWP";
 
@@ -22,9 +23,10 @@ type Props = {
   // Context props
   t: string => string
 };
+
 type State = {
   branchProtectionPermission: BranchWP,
-  selectedValue: SelectValue
+  selectedValue?: SelectValue
 };
 
 const defaultState = {
@@ -34,10 +36,7 @@ const defaultState = {
     branch: "",
     group: false
   },
-  selectedValue: {
-    label: "",
-    value: { id: "", displayName: "" }
-  }
+  selectedValue: undefined
 };
 
 class AddPermissionFormComponent extends React.Component<Props, State> {
@@ -45,34 +44,6 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
     super(props);
     this.state = defaultState;
   }
-
-  loadUserSuggestions = (inputValue: string) => {
-    return this.loadAutocompletion(this.props.userAutocompleteLink, inputValue);
-  };
-
-  loadGroupSuggestions = (inputValue: string) => {
-    return this.loadAutocompletion(
-      this.props.groupAutocompleteLink,
-      inputValue
-    );
-  };
-
-  loadAutocompletion = (url: string, inputValue: string) => {
-    const link = url + "?q=";
-    return fetch(link + inputValue)
-      .then(response => response.json())
-      .then(json => {
-        return json.map(element => {
-          const label = element.displayName
-            ? `${element.displayName} (${element.id})`
-            : element.id;
-          return {
-            value: element,
-            label
-          };
-        });
-      });
-  };
 
   handleDropDownChange = (type: string) => {
     this.setState({
@@ -112,7 +83,8 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
       branchProtectionPermission: {
         ...this.state.branchProtectionPermission,
         group
-      }
+      },
+      selectedValue: undefined
     });
   };
 
@@ -120,15 +92,16 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
     const { t, readOnly } = this.props;
     const { branchProtectionPermission } = this.state;
     const { branch } = branchProtectionPermission;
+
     return (
       <>
         <hr />
         <Subtitle subtitle={t("scm-branchwp-plugin.addSubtitle")} />
-        <label className="label">
-          {t("scm-branchwp-plugin.form.permissionType")}
-        </label>
         <div className="columns is-multiline">
           <div className="column is-full">
+            <label className="label">
+              {t("scm-branchwp-plugin.form.permissionType")}
+            </label>
             <div className="field is-grouped">
               <div className="control">
                 <Radio
@@ -159,12 +132,10 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
               disabled={readOnly}
             />
           </div>
-          <div className="column is-three-fifths">
-            {this.renderAutocomplete()}
-          </div>
-          <div className="column is-two-fifths">
+          <div className="column">{this.renderAutocomplete()}</div>
+          <div className="column">
             <div className="columns">
-              <div className="column is-one-third">
+              <div className="column">
                 <LabelWithHelpIcon
                   label={t("scm-branchwp-plugin.form.permission")}
                   helpText={t("scm-branchwp-plugin.form.permissionHelpText")}
@@ -201,25 +172,21 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
   }
 
   renderAutocomplete = () => {
-    const { t } = this.props;
     const group = this.state.branchProtectionPermission.group;
-    const label = group
-      ? t("scm-branchwp-plugin.form.groupLabel")
-      : t("scm-branchwp-plugin.form.userLabel");
-    const helpText = group
-      ? t("scm-branchwp-plugin.form.groupHelpText")
-      : t("scm-branchwp-plugin.form.userHelpText");
-    const loadSuggestions = group
-      ? this.loadGroupSuggestions
-      : this.loadUserSuggestions;
+    if (group) {
+      return (
+        <GroupAutocomplete
+          autocompleteLink={this.props.groupAutocompleteLink}
+          valueSelected={this.selectName}
+          value={this.state.selectedValue ? this.state.selectedValue : ""}
+        />
+      );
+    }
     return (
-      <Autocomplete
-        label={label}
-        loadSuggestions={loadSuggestions}
-        helpText={helpText}
+      <UserAutocomplete
+        autocompleteLink={this.props.userAutocompleteLink}
         valueSelected={this.selectName}
-        value={this.state.selectedValue}
-        placeholder={label}
+        value={this.state.selectedValue ? this.state.selectedValue : ""}
       />
     );
   };
