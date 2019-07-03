@@ -26,7 +26,7 @@ type Props = {
 
 type State = {
   branchProtectionPermission: BranchWP,
-  selectedValue: SelectValue
+  selectedValue?: SelectValue
 };
 
 const defaultState = {
@@ -36,10 +36,7 @@ const defaultState = {
     branch: "",
     group: false
   },
-  selectedValue: {
-    label: "",
-    value: { id: "", displayName: "" }
-  }
+  selectedValue: undefined
 };
 
 class AddPermissionFormComponent extends React.Component<Props, State> {
@@ -87,7 +84,7 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
         ...this.state.branchProtectionPermission,
         group
       },
-      selectedValue: null
+      selectedValue: undefined
     });
   };
 
@@ -95,6 +92,7 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
     const { t, readOnly } = this.props;
     const { branchProtectionPermission } = this.state;
     const { branch } = branchProtectionPermission;
+
     return (
       <>
         <hr />
@@ -178,17 +176,17 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
     if (group) {
       return (
         <GroupAutocomplete
-          groupAutocompleteLink={this.props.groupAutocompleteLink}
+          autocompleteLink={this.props.groupAutocompleteLink}
           valueSelected={this.selectName}
-          value={this.state.selectedValue}
+          value={this.state.selectedValue ? this.state.selectedValue : ""}
         />
       );
     }
     return (
       <UserAutocomplete
-        userAutocompleteLink={this.props.userAutocompleteLink}
+        autocompleteLink={this.props.userAutocompleteLink}
         valueSelected={this.selectName}
-        value={this.state.selectedValue}
+        value={this.state.selectedValue ? this.state.selectedValue : ""}
       />
     );
   };
