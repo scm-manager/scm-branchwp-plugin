@@ -52,7 +52,7 @@ public class BranchWritePermissionServiceTest {
   public void init() {
     storeFactory = new InMemoryConfigurationStoreFactory();
     service = new BranchWritePermissionService(storeFactory, null);
-    store = storeFactory.withType(BranchWritePermissions.class).withName("branchWritePermission").build();
+    store = storeFactory.withType(BranchWritePermissions.class).withName("branchWritePermission").forRepository(REPOSITORY).build();
   }
 
   public BranchWritePermissionServiceTest() {
