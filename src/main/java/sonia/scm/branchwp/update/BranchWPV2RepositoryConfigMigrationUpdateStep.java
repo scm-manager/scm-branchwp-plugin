@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import sonia.scm.branchwp.service.BranchWritePermission;
 import sonia.scm.branchwp.service.BranchWritePermissions;
 import sonia.scm.migration.UpdateStep;
+import sonia.scm.plugin.Extension;
 import sonia.scm.store.ConfigurationStore;
 import sonia.scm.store.ConfigurationStoreFactory;
 import sonia.scm.update.V1Properties;
@@ -25,6 +26,7 @@ import static sonia.scm.branchwp.service.BranchWritePermission.Type;
 import static sonia.scm.update.V1PropertyReader.REPOSITORY_PROPERTY_READER;
 import static sonia.scm.version.Version.parse;
 
+@Extension
 public class BranchWPV2RepositoryConfigMigrationUpdateStep implements UpdateStep {
 
   private static final Logger LOG = LoggerFactory.getLogger(BranchWPV2RepositoryConfigMigrationUpdateStep.class);
@@ -60,21 +62,21 @@ public class BranchWPV2RepositoryConfigMigrationUpdateStep implements UpdateStep
       return empty();
     }
 
-    List<String> splittedPermissions = Arrays.asList(v1Permissions.split(","));
+    List<String> splittedV1Permissions = Arrays.asList(v1Permissions.split(";"));
 
     List<BranchWritePermission> mappedPermissions = new ArrayList<>();
-    for (String permission : splittedPermissions) {
-      mappedPermissions.add(createPermission(permission));
+    for (String v1Permission : splittedV1Permissions) {
+      mappedPermissions.add(createV2Permission(v1Permission));
     }
 
     BranchWritePermissions v2Permissions = new BranchWritePermissions();
-    v2Permissions.setEnabled(Boolean.getBoolean(properties.get(BRANCHWP_ENABLED)));
+    v2Permissions.setEnabled(Boolean.parseBoolean(properties.get(BRANCHWP_ENABLED)));
     v2Permissions.setPermissions(mappedPermissions);
 
     return of(v2Permissions);
   }
 
-  private BranchWritePermission createPermission(String v1Permission) {
+  private BranchWritePermission createV2Permission(String v1Permission) {
     String[] splittedV1Permission = v1Permission.split(",");
 
     String branch = splittedV1Permission[0].replaceAll("!","");
