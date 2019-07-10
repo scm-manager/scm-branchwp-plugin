@@ -14,9 +14,7 @@ import sonia.scm.update.V1Properties;
 import sonia.scm.update.V1PropertyDAO;
 import sonia.scm.version.Version;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +44,7 @@ public class BranchWPV2RepositoryConfigMigrationUpdateStep implements UpdateStep
   }
 
   @Override
-  public void doUpdate() throws IOException {
+  public void doUpdate() {
     v1PropertyDAO
       .getProperties(REPOSITORY_PROPERTY_READER)
       .havingAnyOf(BRANCHWP_ENABLED, BRANCHWP_PERMISSIONS)
@@ -62,10 +60,10 @@ public class BranchWPV2RepositoryConfigMigrationUpdateStep implements UpdateStep
       return empty();
     }
 
-    List<String> splittedV1Permissions = Arrays.asList(v1Permissions.split(";"));
+    String[] splitV1Permissions = v1Permissions.split(";");
 
     List<BranchWritePermission> mappedPermissions = new ArrayList<>();
-    for (String v1Permission : splittedV1Permissions) {
+    for (String v1Permission : splitV1Permissions) {
       mappedPermissions.add(createV2Permission(v1Permission));
     }
 
