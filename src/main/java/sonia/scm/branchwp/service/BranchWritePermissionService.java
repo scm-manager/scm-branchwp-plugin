@@ -1,7 +1,7 @@
 package sonia.scm.branchwp.service;
 
 import com.google.common.base.Strings;
-import sonia.scm.group.GroupNames;
+import sonia.scm.group.GroupCollector;
 import sonia.scm.repository.NamespaceAndName;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryManager;
@@ -13,6 +13,7 @@ import sonia.scm.util.AssertUtil;
 import sonia.scm.util.GlobUtil;
 
 import javax.inject.Inject;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -26,14 +27,16 @@ public class BranchWritePermissionService {
   public static final String VAR_USERNAME = "\\{username\\}";
   public static final String CUSTOM_ACTION = "branchwp";
 
-  private ConfigurationStoreFactory storeFactory;
-  private RepositoryManager repositoryManager;
+  private final ConfigurationStoreFactory storeFactory;
+  private final RepositoryManager repositoryManager;
+  private final GroupCollector groupCollector;
   private static final String STORE_NAME = "branchWritePermission";
 
   @Inject
-  public BranchWritePermissionService(ConfigurationStoreFactory storeFactory, RepositoryManager repositoryManager) {
+  public BranchWritePermissionService(ConfigurationStoreFactory storeFactory, RepositoryManager repositoryManager, GroupCollector groupCollector) {
     this.storeFactory = storeFactory;
     this.repositoryManager = repositoryManager;
+    this.groupCollector = groupCollector;
   }
 
   /**
@@ -45,12 +48,11 @@ public class BranchWritePermissionService {
    * The user is not privileged if there is no permission found for him or one of his groups.
    *
    * @param user
-   * @param userGroups
    * @param repository
    * @param branch
    * @return true if the user is permitted to write the branch
    */
-  public boolean isPrivileged(User user, GroupNames userGroups, Repository repository, String branch) {
+  public boolean isPrivileged(User user, Repository repository, String branch) {
     AssertUtil.assertIsNotNull(user);
     if (isPermitted(repository)) {
       return true;
@@ -61,10 +63,12 @@ public class BranchWritePermissionService {
       return true;
     }
 
+    Set<String> groups = groupCollector.collect(user.getName());
+
     BooleanSupplier userAllowed = () -> hasUserPermission(user, branch, permissions, BranchWritePermission.Type.ALLOW);
-    BooleanSupplier anyUserGroupsAllowed = () -> hasAnyGroupPermission(userGroups, branch, permissions, BranchWritePermission.Type.ALLOW, user);
+    BooleanSupplier anyUserGroupsAllowed = () -> hasAnyGroupPermission(groups, branch, permissions, BranchWritePermission.Type.ALLOW, user);
     BooleanSupplier userDenied = () -> hasUserPermission(user, branch, permissions, BranchWritePermission.Type.DENY);
-    BooleanSupplier anyUserGroupsDenied = () -> hasAnyGroupPermission(userGroups, branch, permissions, BranchWritePermission.Type.DENY, user);
+    BooleanSupplier anyUserGroupsDenied = () -> hasAnyGroupPermission(groups, branch, permissions, BranchWritePermission.Type.DENY, user);
 
     return !userDenied.getAsBoolean() && !anyUserGroupsDenied.getAsBoolean() && (userAllowed.getAsBoolean() || anyUserGroupsAllowed.getAsBoolean());
   }
@@ -86,7 +90,7 @@ public class BranchWritePermissionService {
     RepositoryPermissions.custom(CUSTOM_ACTION, repository).check();
   }
 
-  private boolean hasAnyGroupPermission(GroupNames userGroups, String branch, BranchWritePermissions permissions, BranchWritePermission.Type type, User user) {
+  private boolean hasAnyGroupPermission(Set<String> userGroups, String branch, BranchWritePermissions permissions, BranchWritePermission.Type type, User user) {
     return permissions.getPermissions().stream()
       .filter(branchWritePermission -> matchBranch(branch, branchWritePermission, user))
       .filter(BranchWritePermission::isGroup)

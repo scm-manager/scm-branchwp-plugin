@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import sonia.scm.EagerSingleton;
 import sonia.scm.branchwp.service.BranchWritePermissionService;
-import sonia.scm.group.GroupNames;
 import sonia.scm.plugin.Extension;
 import sonia.scm.repository.Changeset;
 import sonia.scm.repository.PreReceiveRepositoryHookEvent;
@@ -81,8 +80,7 @@ public class RepositoryHook {
 
   public boolean isCurrentUserPrivileged(Repository repository, String branch) {
     User user = SecurityUtils.getSubject().getPrincipals().oneByType(User.class);
-    GroupNames userGroups = SecurityUtils.getSubject().getPrincipals().oneByType(GroupNames.class);
-    return service.isPrivileged(user, userGroups, repository, branch);
+    return service.isPrivileged(user, repository, branch);
   }
 
   private List<String> getBranches(HookContext eventContext, Repository repository) {
