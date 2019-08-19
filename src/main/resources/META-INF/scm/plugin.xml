@@ -37,7 +37,7 @@
   <scm-version>2</scm-version>
 
   <information>
-    <displayName>Brach Write Protection</displayName>
+    <displayName>Branch Write Protection</displayName>
     <author>Cloudogu GmbH</author>
     <category>Authorization</category>
   </information>
