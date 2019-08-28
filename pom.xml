@@ -14,6 +14,7 @@
   <version>2.0.0-SNAPSHOT</version>
   <name>scm-branchwp-plugin</name>
   <description>Adds branch write protection for repositories</description>
+  <url>https://github.com/scm-manager/scm-branchwp-plugin</url>
 
   <repositories>
     
