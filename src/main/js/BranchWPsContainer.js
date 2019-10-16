@@ -1,7 +1,7 @@
 // @flow
 import React from "react";
-import { Configuration } from "@scm-manager/ui-components";
 import type { Repository } from "@scm-manager/ui-types";
+import { Configuration } from "@scm-manager/ui-components";
 import BranchWPsForm from "./BranchWPsForm";
 
 type Props = {

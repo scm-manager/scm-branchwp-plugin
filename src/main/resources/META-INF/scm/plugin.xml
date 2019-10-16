@@ -42,4 +42,8 @@
     <category>Authorization</category>
   </information>
 
+  <resources>
+    <script>assets/scm-branchwp-plugin.bundle.js</script>
+  </resources>
+
 </plugin>

@@ -1,26 +1,22 @@
 // @flow
 import React from "react";
 import { translate } from "react-i18next";
-import injectSheet from "react-jss";
+import styled from "styled-components";
 import { confirmAlert, Icon } from "@scm-manager/ui-components";
 import type { BranchWP } from "../types/BranchWP";
-import classNames from "classnames";
 
 type Props = {
   permission: BranchWP,
   onDelete: BranchWP => void,
 
   // context props
-  classes: Object,
   t: string => string
 };
 
-const styles = {
-  centerMiddle: {
-    display: "table-cell",
-    verticalAlign: "middle !important"
-  }
-};
+const VCenteredTd = styled.td`
+  display: table-cell;
+  vertical-align: middle !important;
+`;
 
 class BranchWPRow extends React.Component<Props> {
   confirmDelete = () => {
@@ -42,7 +38,7 @@ class BranchWPRow extends React.Component<Props> {
   };
 
   render() {
-    const { permission, classes, t } = this.props;
+    const { permission, t } = this.props;
 
     const iconType =
       permission && permission.group ? (
@@ -56,25 +52,25 @@ class BranchWPRow extends React.Component<Props> {
 
     return (
       <tr>
-        <td className={classes.centerMiddle}>
+        <VCenteredTd>
           {iconType} {permission.name}
-        </td>
+        </VCenteredTd>
         <td>{permission.branch}</td>
         <td>{permission.type}</td>
-        <td className={classNames("is-darker", classes.centerMiddle)}>
+        <VCenteredTd className="is-darker">
           <a
             className="level-item"
             onClick={this.confirmDelete}
             title={t("scm-branchwp-plugin.table.delete")}
           >
             <span className="icon is-small">
-              <i className="fas fa-trash" />
+              <Icon name="trash" color="inherit" />
             </span>
           </a>
-        </td>
+        </VCenteredTd>
       </tr>
     );
   }
 }
 
-export default translate("plugins")(injectSheet(styles)(BranchWPRow));
+export default translate("plugins")(BranchWPRow);

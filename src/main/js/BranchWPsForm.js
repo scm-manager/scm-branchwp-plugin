@@ -1,8 +1,8 @@
 //@flow
 import React from "react";
 import { translate } from "react-i18next";
-import type { BranchWPs, BranchWP } from "./types/BranchWP";
 import { Checkbox, Subtitle } from "@scm-manager/ui-components";
+import type { BranchWPs, BranchWP } from "./types/BranchWP";
 import BranchWPTable from "./table/BranchWPTable";
 import AddPermissionFormComponent from "./AddPermissionFormComponent";
 
