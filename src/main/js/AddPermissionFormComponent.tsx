@@ -1,7 +1,6 @@
-// @flow
 import React from "react";
-import { translate } from "react-i18next";
-import type { SelectValue } from "@scm-manager/ui-types";
+import { WithTranslation, withTranslation } from "react-i18next";
+import { SelectValue } from "@scm-manager/ui-types";
 import {
   Button,
   InputField,
@@ -12,21 +11,18 @@ import {
   GroupAutocomplete,
   UserAutocomplete
 } from "@scm-manager/ui-components";
-import type { BranchWP } from "./types/BranchWP";
+import { BranchWP } from "./types/BranchWP";
 
-type Props = {
-  userAutocompleteLink: string,
-  groupAutocompleteLink: string,
-  readOnly: boolean,
-  onAdd: BranchWP => void,
-
-  // Context props
-  t: string => string
+type Props = WithTranslation & {
+  userAutocompleteLink: string;
+  groupAutocompleteLink: string;
+  readOnly: boolean;
+  onAdd: (p: BranchWP) => void;
 };
 
 type State = {
-  branchProtectionPermission: BranchWP,
-  selectedValue?: SelectValue
+  branchProtectionPermission: BranchWP;
+  selectedValue?: SelectValue;
 };
 
 const defaultState = {
@@ -76,8 +72,19 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
     });
   };
 
-  permissionScopeChanged = event => {
-    const group = event.target.value === "GROUP_PERMISSION";
+  changeToUserPermissionScope = (value: boolean) => {
+    if (value) {
+      this.permissionScopeChanged(false);
+    }
+  }
+
+  changeToGroupPermissionScope = (value: boolean) => {
+    if (value) {
+      this.permissionScopeChanged(true);
+    }
+  }
+
+  permissionScopeChanged = (group: boolean) => {
     this.setState({
       ...this.state,
       branchProtectionPermission: {
@@ -99,9 +106,7 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
         <Subtitle subtitle={t("scm-branchwp-plugin.addSubtitle")} />
         <div className="columns is-multiline">
           <div className="column is-full">
-            <label className="label">
-              {t("scm-branchwp-plugin.form.permissionType")}
-            </label>
+            <label className="label">{t("scm-branchwp-plugin.form.permissionType")}</label>
             <div className="field is-grouped">
               <div className="control">
                 <Radio
@@ -109,14 +114,14 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
                   name="permission_scope"
                   value="USER_PERMISSION"
                   checked={!this.state.branchProtectionPermission.group}
-                  onChange={this.permissionScopeChanged}
+                  onChange={this.changeToUserPermissionScope}
                 />
                 <Radio
                   label={t("scm-branchwp-plugin.form.groupPermission")}
                   name="permission_scope"
                   value="GROUP_PERMISSION"
                   checked={this.state.branchProtectionPermission.group}
-                  onChange={this.permissionScopeChanged}
+                  onChange={this.changeToGroupPermissionScope}
                 />
               </div>
             </div>
@@ -151,15 +156,13 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
                 <Button
                   label={t("scm-branchwp-plugin.form.add")}
                   disabled={
-                    this.props.readOnly ||
-                    !branch ||
-                    !(
-                      this.state.selectedValue && this.state.selectedValue.label
-                    )
+                    this.props.readOnly || !branch || !(this.state.selectedValue && this.state.selectedValue.label)
                   }
                   action={() => {
                     this.props.onAdd(this.state.branchProtectionPermission);
-                    this.setState({ ...defaultState });
+                    this.setState({
+                      ...defaultState
+                    });
                   }}
                   className="label-icon-spacing"
                 />
@@ -192,4 +195,4 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
   };
 }
 
-export default translate("plugins")(AddPermissionFormComponent);
+export default withTranslation("plugins")(AddPermissionFormComponent);

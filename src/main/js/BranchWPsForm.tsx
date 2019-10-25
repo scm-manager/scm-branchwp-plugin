@@ -1,20 +1,16 @@
-//@flow
 import React from "react";
-import { translate } from "react-i18next";
+import { WithTranslation, withTranslation } from "react-i18next";
 import { Checkbox, Subtitle } from "@scm-manager/ui-components";
-import type { BranchWPs, BranchWP } from "./types/BranchWP";
+import { BranchWPs, BranchWP } from "./types/BranchWP";
 import BranchWPTable from "./table/BranchWPTable";
 import AddPermissionFormComponent from "./AddPermissionFormComponent";
 
-type Props = {
-  initialConfiguration: BranchWPs,
-  readOnly: boolean,
-  onConfigurationChange: (BranchWPs, boolean) => void,
-  userAutocompleteLink: string,
-  groupAutocompleteLink: string,
-
-  // context prop
-  t: string => string
+type Props = WithTranslation & {
+  initialConfiguration: BranchWPs;
+  readOnly: boolean;
+  onConfigurationChange: (p1: BranchWPs, p2: boolean) => void;
+  userAutocompleteLink: string;
+  groupAutocompleteLink: string;
 };
 
 type State = BranchWPs & {};
@@ -22,31 +18,32 @@ type State = BranchWPs & {};
 class BranchWPsForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { ...props.initialConfiguration };
+    this.state = {
+      ...props.initialConfiguration
+    };
   }
 
   isValid() {
     const { permissions } = this.state;
     let valid = true;
     permissions.map(branchWP => {
-      valid =
-        valid &&
-        branchWP.name.trim() !== "" &&
-        branchWP.branch.trim() !== "" &&
-        branchWP.type.trim() !== "";
+      valid = valid && branchWP.name.trim() !== "" && branchWP.branch.trim() !== "" && branchWP.type.trim() !== "";
     });
     return valid;
   }
 
   updateBranchWPs(permissions) {
-    this.setState({ permissions }, () =>
-      this.props.onConfigurationChange(this.state, this.isValid())
+    this.setState(
+      {
+        permissions
+      },
+      () => this.props.onConfigurationChange(this.state, this.isValid())
     );
   }
 
   onDelete = deletedBranchWP => {
     const { permissions } = this.state;
-    let index = permissions.indexOf(deletedBranchWP);
+    const index = permissions.indexOf(deletedBranchWP);
     permissions.splice(index, 1);
     this.updateBranchWPs(permissions);
   };
@@ -70,9 +67,14 @@ class BranchWPsForm extends React.Component<Props, State> {
   };
 
   onChangeEnabled = isEnabled => {
-    this.setState({ enabled: isEnabled }, () => {
-      this.props.onConfigurationChange(this.state, this.isValid());
-    });
+    this.setState(
+      {
+        enabled: isEnabled
+      },
+      () => {
+        this.props.onConfigurationChange(this.state, this.isValid());
+      }
+    );
   };
 
   renderAddUserFormComponent = () => {
@@ -105,10 +107,7 @@ class BranchWPsForm extends React.Component<Props, State> {
           <>
             <hr />
             <Subtitle subtitle={t("scm-branchwp-plugin.editSubtitle")} />
-            <BranchWPTable
-              permissions={this.state.permissions}
-              onDelete={this.onDelete}
-            />
+            <BranchWPTable permissions={this.state.permissions} onDelete={this.onDelete} />
             {this.renderAddUserFormComponent()}
           </>
         ) : null}
@@ -117,4 +116,4 @@ class BranchWPsForm extends React.Component<Props, State> {
   }
 }
 
-export default translate("plugins")(BranchWPsForm);
+export default withTranslation("plugins")(BranchWPsForm);

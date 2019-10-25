@@ -1,16 +1,12 @@
-// @flow
 import React from "react";
-import { translate } from "react-i18next";
+import { WithTranslation, withTranslation } from "react-i18next";
 import { LabelWithHelpIcon, Notification } from "@scm-manager/ui-components";
-import type { BranchWP } from "../types/BranchWP";
+import { BranchWP } from "../types/BranchWP";
 import BranchWPRow from "./BranchWPRow";
 
-type Props = {
-  permissions: BranchWP[],
-  onDelete: BranchWP => void,
-
-  // context prop
-  t: string => string
+type Props = WithTranslation & {
+  permissions: BranchWP[];
+  onDelete: (p: BranchWP) => void;
 };
 
 class BranchWPTable extends React.Component<Props> {
@@ -50,12 +46,8 @@ class BranchWPTable extends React.Component<Props> {
         </table>
       );
     }
-    return (
-      <Notification type="info">
-        {t("scm-branchwp-plugin.noPermissions")}
-      </Notification>
-    );
+    return <Notification type="info">{t("scm-branchwp-plugin.noPermissions")}</Notification>;
   }
 }
 
-export default translate("plugins")(BranchWPTable);
+export default withTranslation("plugins")(BranchWPTable);
