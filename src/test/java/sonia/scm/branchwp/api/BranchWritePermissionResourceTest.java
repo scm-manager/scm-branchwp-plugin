@@ -1,7 +1,5 @@
 package sonia.scm.branchwp.api;
 
-import org.jboss.resteasy.core.Dispatcher;
-import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sonia.scm.branchwp.service.BranchWritePermission;
 import sonia.scm.branchwp.service.BranchWritePermissionService;
 import sonia.scm.branchwp.service.BranchWritePermissions;
+import sonia.scm.web.RestDispatcher;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
@@ -49,15 +48,15 @@ public class BranchWritePermissionResourceTest {
 
   private BranchWritePermissionMapper mapper = new BranchWritePermissionMapperImpl();
 
-  private Dispatcher dispatcher;
+  private RestDispatcher dispatcher;
   private final MockHttpResponse response = new MockHttpResponse();
 
 
   @BeforeEach
   public void init() {
     resource = new BranchWritePermissionResource(service, mapper);
-    dispatcher = MockDispatcherFactory.createDispatcher();
-    dispatcher.getRegistry().addSingletonResource(resource);
+    dispatcher = new RestDispatcher();
+    dispatcher.addSingletonResource(resource);
   }
 
   @Test
