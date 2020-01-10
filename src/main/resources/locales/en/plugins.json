@@ -30,7 +30,8 @@
       "message": "Do you really want to delete the Branch Permission?",
       "submit": "Yes (do not forget to submit)",
       "cancel": "No"
-    }
+    },
+    "obstacle": "You do not have permissions to modify the target branch."
   },
   "permissions": {
     "repository": {
