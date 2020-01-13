@@ -50,5 +50,11 @@
         "description": "May modify branch permissions"
       }
     }
+  },
+  "errors": {
+    "EiRnRS0Tw1": {
+      "displayName": "Missing branch permission",
+      "description": "You are not permitted to modify the branch."
+    }
   }
 }

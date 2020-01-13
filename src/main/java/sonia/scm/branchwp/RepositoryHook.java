@@ -73,7 +73,7 @@ public class RepositoryHook {
     List<String> branches = getBranches(context, repository);
     for (String branch : branches) {
       if (!isCurrentUserPrivileged(repository, branch)) {
-        throw new BranchWritePermissionException("Permission denied for the branch " + branch);
+        throw new BranchWritePermissionException(repository, branch);
       }
     }
   }

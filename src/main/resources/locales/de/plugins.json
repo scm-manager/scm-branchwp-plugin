@@ -49,5 +49,11 @@
         "description": "Darf die Schreibrechte für Branches verändern"
       }
     }
+  },
+  "errors": {
+    "EiRnRS0Tw1": {
+      "displayName": "Fehlende Branch-Berechtigun",
+      "description": "Sie sind nicht berechtigt, den Branch zu verändern."
+    }
   }
 }
