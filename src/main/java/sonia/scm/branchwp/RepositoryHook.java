@@ -64,23 +64,14 @@ public class RepositoryHook {
       return;
     }
 
-    if (BranchWritePermissionService.isPermitted(repository)){
-      log.debug("skip branchwp check for {}, because the user has modify privileges to the repository", repository.getNamespaceAndName());
-      return;
-    }
-
     log.trace("received hook for repository {}", repository.getName());
     List<String> branches = getBranches(context, repository);
+    User user = SecurityUtils.getSubject().getPrincipals().oneByType(User.class);
     for (String branch : branches) {
-      if (!isCurrentUserPrivileged(repository, branch)) {
-        throw new BranchWritePermissionException("Permission denied for the branch " + branch);
+      if (!service.isPrivileged(user, repository, branch)) {
+        throw new BranchWritePermissionException(repository, branch);
       }
     }
-  }
-
-  public boolean isCurrentUserPrivileged(Repository repository, String branch) {
-    User user = SecurityUtils.getSubject().getPrincipals().oneByType(User.class);
-    return service.isPrivileged(user, repository, branch);
   }
 
   private List<String> getBranches(HookContext eventContext, Repository repository) {

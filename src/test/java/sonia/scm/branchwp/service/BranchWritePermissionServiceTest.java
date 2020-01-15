@@ -152,7 +152,7 @@ public class BranchWritePermissionServiceTest {
 
   @Test
   @SubjectAware(username = "owner", password = "secret")
-  public void shouldPrivilegeUserIfUserIsOwnerOfRepositoryOrAdmin() {
+  public void shouldNotPrivilegeUserIfUserIsOwnerOfRepositoryOrAdmin() {
     assignGroups(GROUP_NAME);
 
     BranchWritePermissions permissions = createBranchWPs(true);
@@ -161,7 +161,7 @@ public class BranchWritePermissionServiceTest {
     store.set(permissions);
     boolean privileged = service.isPrivileged(USER, REPOSITORY, BRANCH);
 
-    assertThat(privileged).isTrue();
+    assertThat(privileged).isFalse();
   }
 
   @Test

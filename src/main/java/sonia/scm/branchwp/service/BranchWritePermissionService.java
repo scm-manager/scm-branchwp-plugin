@@ -54,9 +54,6 @@ public class BranchWritePermissionService {
    */
   public boolean isPrivileged(User user, Repository repository, String branch) {
     AssertUtil.assertIsNotNull(user);
-    if (isPermitted(repository)) {
-      return true;
-    }
 
     BranchWritePermissions permissions = getPermissions(repository);
     if (!isPluginEnabled(permissions)) {

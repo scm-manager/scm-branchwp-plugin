@@ -30,7 +30,8 @@
       "message": "Do you really want to delete the Branch Permission?",
       "submit": "Yes (do not forget to submit)",
       "cancel": "No"
-    }
+    },
+    "obstacle": "You do not have permissions to modify the target branch."
   },
   "permissions": {
     "repository": {
@@ -48,6 +49,12 @@
         "displayName": "modify branch permissions",
         "description": "May modify branch permissions"
       }
+    }
+  },
+  "errors": {
+    "EiRnRS0Tw1": {
+      "displayName": "Missing branch permission",
+      "description": "You are not permitted to modify the branch."
     }
   }
 }
