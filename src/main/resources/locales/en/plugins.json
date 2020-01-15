@@ -31,7 +31,7 @@
       "submit": "Yes (do not forget to submit)",
       "cancel": "No"
     },
-    "obstacle": "You do not have permissions to modify the target branch."
+    "obstacle": "You do not have permissions to modify the branch."
   },
   "permissions": {
     "repository": {
