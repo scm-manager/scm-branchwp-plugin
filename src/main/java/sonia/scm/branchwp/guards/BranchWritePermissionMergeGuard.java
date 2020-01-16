@@ -1,4 +1,4 @@
-package sonia.scm.branchwp.review;
+package sonia.scm.branchwp.guards;
 
 import com.cloudogu.scm.review.pullrequest.service.MergeGuard;
 import com.cloudogu.scm.review.pullrequest.service.MergeObstacle;

@@ -1,4 +1,4 @@
-package sonia.scm.branchwp.review;
+package sonia.scm.branchwp.guards;
 
 import com.cloudogu.scm.editor.ChangeGuard;
 import com.cloudogu.scm.editor.ChangeObstacle;
