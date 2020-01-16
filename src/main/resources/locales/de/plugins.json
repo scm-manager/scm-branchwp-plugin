@@ -30,7 +30,8 @@
       "message": "Soll die Branch-Berechtigung wirklich gelöscht werden?",
       "submit": "Ja (Speichern nicht vergessen)",
       "cancel": "Nein"
-    }
+    },
+    "obstacle": "Sie dürfen den Branch nicht verändern."
   },
   "permissions": {
     "repository": {

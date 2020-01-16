@@ -70,6 +70,10 @@ public class BranchWritePermissionService {
     return !userDenied.getAsBoolean() && !anyUserGroupsDenied.getAsBoolean() && (userAllowed.getAsBoolean() || anyUserGroupsAllowed.getAsBoolean());
   }
 
+  public boolean isPrivileged(User user, NamespaceAndName namespaceAndName, String branch) {
+    return isPrivileged(user, repositoryManager.get(namespaceAndName), branch);
+  }
+
   public static boolean isPermitted(Repository repository) {
     return RepositoryPermissions.custom(CUSTOM_ACTION, repository).isPermitted();
   }
