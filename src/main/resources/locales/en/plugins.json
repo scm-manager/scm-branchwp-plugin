@@ -2,7 +2,7 @@
   "scm-branchwp-plugin": {
     "navLink": "Branch Permissions",
     "enable": "Enable Branch Write Permissions",
-    "enableHelpText": "If enabled, nobody can write to the repository expect administrators, repository owners and the specified rules.",
+    "enableHelpText": "If enabled, nobody can write to the repository expect when permitted by the specified rules.",
     "editSubtitle": "Write permission for branches",
     "addSubtitle": "Add permission",
     "noPermissions": "No branch permissions found.",

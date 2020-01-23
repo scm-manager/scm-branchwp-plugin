@@ -2,7 +2,7 @@
   "scm-branchwp-plugin": {
     "navLink": "Branch-Berechtigungen",
     "enable": "Schreib-Berechtigungen für Branches aktivieren",
-    "enableHelpText": "Wenn diese Option aktiv ist, können nur Administratoren, Owner des Repositories und die spezifizierten Regeln auf dem Repository schreiben.",
+    "enableHelpText": "Wenn diese Option aktiv ist, kann das Repository nur entsprechend der spezifizierten Regeln geschrieben werden.",
     "editSubtitle": "Schreib-Berechtigungen für Branches",
     "addSubtitle": "Berechtigung hinzufügen",
     "noPermissions": "Keine Branch-Berechtigungen gefunden",
