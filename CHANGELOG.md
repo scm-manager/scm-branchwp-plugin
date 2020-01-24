@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Merge check for review plugin ([#2](https://github.com/scm-manager/scm-branchwp-plugin/pull/2))
+- Let checks work for admins, too ([#2](https://github.com/scm-manager/scm-branchwp-plugin/pull/2))
 - Change check for editor plugin ([#3](https://github.com/scm-manager/scm-branchwp-plugin/pull/3))
 
 ## [rc1] - 2019-12-2
