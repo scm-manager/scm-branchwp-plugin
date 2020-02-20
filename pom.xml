@@ -24,6 +24,16 @@
         <version>1.0.0-rc2</version>
       </plugin>
 
+      <plugin>
+        <groupId>io.openapitools.swagger</groupId>
+        <artifactId>swagger-maven-plugin</artifactId>
+        <configuration>
+          <resourcePackages>
+            <resourcePackage>sonia.scm.branchwp.api</resourcePackage>
+          </resourcePackages>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 
