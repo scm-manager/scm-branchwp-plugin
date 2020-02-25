@@ -19,12 +19,6 @@
     <plugins>
 
       <plugin>
-        <groupId>sonia.scm.maven</groupId>
-        <artifactId>smp-maven-plugin</artifactId>
-        <version>1.0.0-rc2</version>
-      </plugin>
-
-      <plugin>
         <groupId>io.openapitools.swagger</groupId>
         <artifactId>swagger-maven-plugin</artifactId>
         <configuration>
