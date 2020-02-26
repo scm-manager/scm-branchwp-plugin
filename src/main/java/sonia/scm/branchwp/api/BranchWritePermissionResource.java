@@ -1,7 +1,5 @@
 package sonia.scm.branchwp.api;
 
-import com.webcohesion.enunciate.metadata.rs.ResponseCode;
-import com.webcohesion.enunciate.metadata.rs.StatusCodes;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -82,12 +80,6 @@ public class BranchWritePermissionResource {
       schema = @Schema(implementation = ErrorDto.class)
     )
   )
-  @StatusCodes({
-    @ResponseCode(code = 204, condition = "no content"),
-    @ResponseCode(code = 401, condition = "not authenticated / invalid credentials"),
-    @ResponseCode(code = 403, condition = "not authorized, the current user does not have the privilege"),
-    @ResponseCode(code = 500, condition = "internal server error")
-  })
   public void put(@Context UriInfo uriInfo, @PathParam("namespace") String namespace, @PathParam("name") String name, BranchWritePermissionsDto permissions) {
     service.setPermissions(namespace, name, mapper.using(uriInfo).map(permissions));
   }
