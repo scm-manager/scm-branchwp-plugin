@@ -41,7 +41,12 @@ public class BranchWritePermissionResource {
   @GET
   @Path("/{namespace}/{name}")
   @Produces(MediaType.APPLICATION_JSON)
-  @Operation(summary = "Get branchwp configuration", description = "Returns the branchwp configuration.", tags = "BranchWP Plugin")
+  @Operation(
+    summary = "Get branchwp configuration",
+    description = "Returns the branchwp configuration.",
+    tags = "BranchWP Plugin",
+    operationId = "branchwp_get_config"
+  )
   @ApiResponse(
     responseCode = "200",
     description = "success",
@@ -68,7 +73,12 @@ public class BranchWritePermissionResource {
   @PUT
   @Path("/{namespace}/{name}")
   @Consumes(MediaType.APPLICATION_JSON)
-  @Operation(summary = "Update branchwp configuration", description = "Modifies the branchwp configuration.", tags = "AuthorMapping Plugin")
+  @Operation(
+    summary = "Update branchwp configuration",
+    description = "Modifies the branchwp configuration.",
+    tags = "AuthorMapping Plugin",
+    operationId = "branchwp_put_config"
+  )
   @ApiResponse(responseCode = "204", description = "update success")
   @ApiResponse(responseCode = "401", description = "not authenticated / invalid credentials")
   @ApiResponse(responseCode = "403", description = "not authorized /  the current user does not have the \"branchwp\" privilege")
