@@ -76,7 +76,7 @@ public class BranchWritePermissionResource {
   @Operation(
     summary = "Update branchwp configuration",
     description = "Modifies the branchwp configuration.",
-    tags = "AuthorMapping Plugin",
+    tags = "BranchWP Plugin",
     operationId = "branchwp_put_config"
   )
   @ApiResponse(responseCode = "204", description = "update success")
