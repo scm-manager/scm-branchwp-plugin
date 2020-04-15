@@ -28,6 +28,7 @@ import com.cloudogu.scm.editor.ChangeObstacle;
 import org.apache.shiro.SecurityUtils;
 import sonia.scm.branchwp.service.BranchWritePermissionService;
 import sonia.scm.plugin.Extension;
+import sonia.scm.plugin.Requires;
 import sonia.scm.repository.NamespaceAndName;
 import sonia.scm.user.User;
 
@@ -37,7 +38,8 @@ import java.util.Collection;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 
-@Extension(requires = "scm-editor-plugin")
+@Extension
+@Requires("scm-editor-plugin")
 public class BranchWritePermissionChangeGuard implements ChangeGuard {
 
   private final BranchWritePermissionService service;

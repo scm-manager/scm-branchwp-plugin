@@ -29,6 +29,7 @@ import com.cloudogu.scm.review.pullrequest.service.PullRequest;
 import org.apache.shiro.SecurityUtils;
 import sonia.scm.branchwp.service.BranchWritePermissionService;
 import sonia.scm.plugin.Extension;
+import sonia.scm.plugin.Requires;
 import sonia.scm.repository.Repository;
 import sonia.scm.user.User;
 
@@ -38,7 +39,8 @@ import java.util.Collection;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 
-@Extension(requires = "scm-review-plugin")
+@Extension
+@Requires("scm-review-plugin")
 public class BranchWritePermissionMergeGuard implements MergeGuard {
 
   private final BranchWritePermissionService service;
