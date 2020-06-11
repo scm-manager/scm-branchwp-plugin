@@ -46,7 +46,7 @@
   "verbs": {
     "repository": {
       "branchwp": {
-        "displayName": "modify branch permissions",
+        "displayName": "Modify branch permissions",
         "description": "May modify branch permissions"
       }
     }
