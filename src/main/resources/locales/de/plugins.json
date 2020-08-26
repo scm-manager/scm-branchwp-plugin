@@ -53,7 +53,7 @@
   },
   "errors": {
     "EiRnRS0Tw1": {
-      "displayName": "Fehlende Branch-Berechtigun",
+      "displayName": "Fehlende Branch-Berechtigung",
       "description": "Sie sind nicht berechtigt, den Branch zu verändern."
     }
   }
