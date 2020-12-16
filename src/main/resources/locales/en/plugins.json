@@ -1,23 +1,24 @@
 {
   "scm-branchwp-plugin": {
     "navLink": "Branch Permissions",
+    "subtitle": "Branch Permissions",
     "enable": "Enable Branch Write Permissions",
     "enableHelpText": "If enabled, nobody can write to the repository expect when permitted by the specified rules.",
-    "editSubtitle": "Write permission for branches",
-    "addSubtitle": "Add permission",
+    "editSubtitle": "Write Permission for Branches",
+    "addSubtitle": "Add Permission",
     "noPermissions": "No branch permissions found.",
     "form": {
-      "permissionType": "Permission type",
+      "permissionType": "Permission Type",
       "userPermission": "User Permission",
       "groupPermission": "Group Permission",
       "branch": "Branch",
       "branchHelpText": "Enter a branch name or a pattern like feature/* {mail}/* {username}/feature* {mail} and {username} would be replaced with the user mail and username.",
       "permission": "Permission",
       "permissionHelpText": "Select the branch write permission",
-      "add": "Add"
+      "add": "Add Permission"
     },
     "table": {
-      "name": "User or group",
+      "name": "User or Group",
       "nameHelpText": "Manage permissions for a specific user or group.",
       "branch": "Branch",
       "permission": "Permission",
