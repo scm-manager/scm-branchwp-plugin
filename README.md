@@ -69,7 +69,7 @@ A quick look at the files and directories you'll see in an SCM-Manager project.
         1. **`java/`**: This directory contains the Java code.
         2. **`js/`**: This directory contains the JavaScript code for the web ui, inclusive unit tests: suffixed with `.test.ts`
         3. **`resources/`**: This directory contains the classpath resources.
-      2. **`test/`**
+    2. **`test/`**
         1. **`java/`**: This directory contains the Java unit tests.
         2. **`resources/`**: This directory contains classpath resources for unit tests.
 
