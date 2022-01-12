@@ -66,7 +66,6 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
 
   handleDropDownChange = (type: string) => {
     this.setState({
-      ...this.state,
       branchProtectionPermission: {
         ...this.state.branchProtectionPermission,
         type
@@ -76,7 +75,6 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
 
   selectName = (selection: SelectValue) => {
     this.setState({
-      ...this.state,
       branchProtectionPermission: {
         ...this.state.branchProtectionPermission,
         name: selection.value.id
@@ -87,7 +85,6 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
 
   handleBranchExpressionChange = (branch: string) => {
     this.setState({
-      ...this.state,
       branchProtectionPermission: {
         ...this.state.branchProtectionPermission,
         branch
@@ -109,7 +106,6 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
 
   permissionScopeChanged = (group: boolean) => {
     this.setState({
-      ...this.state,
       branchProtectionPermission: {
         ...this.state.branchProtectionPermission,
         group
@@ -183,8 +179,13 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
                   }
                   action={() => {
                     this.props.onAdd(this.state.branchProtectionPermission);
-                    this.setState({
-                      ...defaultState
+                  this.setState ({
+                      ...defaultState,
+                      branchProtectionPermission: {
+                        ...defaultState.branchProtectionPermission,
+                        branch: branchProtectionPermission.branch,
+                        group: branchProtectionPermission.group
+                      }
                     });
                   }}
                   className="label-icon-spacing"
