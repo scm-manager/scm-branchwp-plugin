@@ -184,7 +184,8 @@ class AddPermissionFormComponent extends React.Component<Props, State> {
                       branchProtectionPermission: {
                         ...defaultState.branchProtectionPermission,
                         branch: branchProtectionPermission.branch,
-                        group: branchProtectionPermission.group
+                        group: branchProtectionPermission.group,
+                        type: branchProtectionPermission.type
                       }
                     });
                   }}
