@@ -80,7 +80,6 @@ class BranchWPsForm extends React.Component<Props, State> {
   userBranchPermissionAdded = (permission: BranchWP) => {
     this.setState(
       {
-        ...this.state,
         permissions: [...this.state.permissions, permission]
       },
       () => {
