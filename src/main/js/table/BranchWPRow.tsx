@@ -49,6 +49,7 @@ class BranchWPRow extends React.Component<Props> {
           onClick: () => onDelete(permission)
         },
         {
+          className: "is-info",
           label: t("scm-branchwp-plugin.confirmDeleteAlert.cancel"),
           onClick: () => null
         }
