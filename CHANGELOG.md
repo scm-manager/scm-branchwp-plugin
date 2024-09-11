@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.0.0 - 2024-09-11
+### Changed
+- Changeover to AGPLv3 license
+
 ## 2.1.1 - 2022-06-02
 ### Fixed
 - Enlarge color difference between options in Confirm Alert ([#42](https://github.com/scm-manager/scm-branchwp-plugin/pull/42))
@@ -31,7 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Let checks work for admins, too ([#2](https://github.com/scm-manager/scm-branchwp-plugin/pull/2))
 - Change check for editor plugin ([#3](https://github.com/scm-manager/scm-branchwp-plugin/pull/3))
 
-## 2.0.0-rc2 - skipped
-
 ## 2.0.0-rc1 - 2019-12-2
+### Added
 - First public release candidate for SCM-Manager 2
