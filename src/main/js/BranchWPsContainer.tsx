@@ -15,8 +15,10 @@
  */
 
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Repository } from "@scm-manager/ui-types";
 import { Configuration } from "@scm-manager/ui-components";
+import { Subtitle, useDocumentTitleForRepository } from "@scm-manager/ui-core";
 import BranchWPsForm from "./BranchWPsForm";
 
 type Props = {
@@ -25,15 +27,19 @@ type Props = {
   indexLinks: object;
 };
 
-class BranchWPsContainer extends React.Component<Props> {
-  render() {
-    const { link, indexLinks } = this.props;
-    const userAutoCompleteLink = indexLinks.autocomplete.find(link => link.name === "users").href;
-    const groupsAutoCompleteLink = indexLinks.autocomplete.find(link => link.name === "groups").href;
-    return (
+const BranchWPsContainer: React.FC<Props> = ({ repository, link, indexLinks }) => {
+  const { t } = useTranslation("plugins");
+  useDocumentTitleForRepository(repository, t("scm-branchwp-plugin.subtitle"));
+
+  const userAutoCompleteLink = indexLinks.autocomplete.find((link) => link.name === "users")?.href;
+  const groupsAutoCompleteLink = indexLinks.autocomplete.find((link) => link.name === "groups")?.href;
+
+  return (
+    <>
+      <Subtitle subtitle={t("scm-branchwp-plugin.subtitle")} />
       <Configuration
         link={link}
-        render={props => (
+        render={(props) => (
           <BranchWPsForm
             {...props}
             userAutocompleteLink={userAutoCompleteLink}
@@ -41,8 +47,8 @@ class BranchWPsContainer extends React.Component<Props> {
           />
         )}
       />
-    );
-  }
-}
+    </>
+  );
+};
 
 export default BranchWPsContainer;

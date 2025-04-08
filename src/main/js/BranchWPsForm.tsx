@@ -112,7 +112,6 @@ class BranchWPsForm extends React.Component<Props, State> {
 
     return (
       <>
-        <Subtitle subtitle={t("scm-branchwp-plugin.subtitle")} />
         <Checkbox
           checked={enabled}
           onChange={this.onChangeEnabled}
