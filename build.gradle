@@ -25,7 +25,7 @@ dependencies {
 }
 
 scmPlugin {
-  scmVersion = "3.8.1-SNAPSHOT"
+  scmVersion = "3.9.0"
   displayName = "Branch Write Protection"
   description = "Adds branch write protection for repositories"
   author = "Cloudogu GmbH"
