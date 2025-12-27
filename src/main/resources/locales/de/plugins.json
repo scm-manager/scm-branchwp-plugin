@@ -14,7 +14,7 @@
       "branch": "Branch",
       "branchHelpText": "Hier kann ein Branch-Name oder Muster angegeben werden. Diese Muster können mit user, mail und username ersetzt werden: feature/* {mail}/* {username}/feature* {mail} und {username}.",
       "permission": "Berechtigung",
-      "permissionHelpText": "Auswahl der Branch Schreib-Berechtigung.",
+      "permissionHelpText": "Auswahl der Branch-Schreib-Berechtigung.",
       "add": "Hinzufügen"
     },
     "table": {
